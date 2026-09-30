@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BRWLAB, an experimental coffee lab in Kannur</title>
+<meta name="description" content="BRWLAB is an experimental coffee lab near Fort Road, Kannur. Single-origin Kerala coffee, ground per order and extracted by protocol. You are the experiment.">
+<meta name="theme-color" content="#121C1C">
+<!-- DEPLOY STEP: add og:url and og:image with the live absolute URL -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 140'%3E%3Cpath fill='%23D91734' fill-rule='evenodd' d='M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/NeueMontreal-Bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="scrollcraft.css?v=20261001">
+<style>
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Medium.otf") format("opentype"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Bold.otf") format("opentype"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Vin Mono Pro"; src: url("assets/fonts/VinMonoPro-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+
+  :root {
+    --sc-canvas:     #121C1C;
+    --sc-surface:    #1A2828;
+    --sc-ink:        #EEF3F1;
+    --sc-ink-soft:   #93A8A4;
+    --sc-accent:     #D91734;
+    --sc-accent-ink: #FFF6F4;
+    --sc-font-display: "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+    --sc-font-text:    "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+    --sc-font-mono:    "Vin Mono Pro", ui-monospace, monospace;
+    --sc-shadow-color: 180 30% 3%;
+    --sc-r-sm: 3px;
+    --red: #D91734;
+    --bone: #FFF6F4;
+  }
+  html { background: var(--sc-canvas); overflow-x: hidden; overflow-x: clip; }
+  body { overflow-x: hidden; overflow-x: clip; letter-spacing: 0; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .skip { position: fixed; left: var(--sc-4); top: var(--sc-4); z-index: 100; padding: var(--sc-2) var(--sc-3);
+          background: var(--sc-ink); color: var(--sc-canvas); transform: translateY(-200%); }
+  .skip:focus { transform: none; }
+
+  /* Heavy and tight, like the wordmark. */
+  .hd { font-family: var(--sc-font-display); font-weight: 700; letter-spacing: -0.045em; line-height: 0.9; margin: 0; text-wrap: balance; }
+  .mono { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); letter-spacing: 0.02em; color: var(--sc-ink-soft); }
+
+  /* ------------------------------------------------------------ bar */
+  .bar { position: fixed; z-index: var(--sc-z-chrome); inset: 0 0 auto 0; display: flex; align-items: center;
+         justify-content: space-between; gap: var(--sc-4);
+         padding: calc(var(--sc-4) + env(safe-area-inset-top, 0px)) var(--sc-gutter) var(--sc-4);
+         background: linear-gradient(to bottom, color-mix(in oklab, var(--sc-canvas) 92%, transparent) 40%, transparent); }
+  .mark { display: inline-flex; align-items: center; gap: var(--sc-3); text-decoration: none; }
+  .mark svg { width: 2.1rem; height: auto; }
+  .mark svg path { fill: var(--red); fill-rule: evenodd; }
+  .mark span { font-weight: 700; letter-spacing: -0.04em; font-size: 1.25rem; }
+  .bar nav { display: flex; align-items: baseline; gap: var(--sc-5); font-size: var(--sc-t-sm); }
+  .bar nav a { text-decoration: none; transition: color var(--sc-d-fast) var(--sc-ease-out); }
+  .bar nav a:hover { color: var(--red); }
+  .bar .cta { padding: 0.45em 0.9em; background: var(--red); color: var(--bone); border-radius: var(--sc-r-sm);
+              transition: transform var(--sc-d-fast) var(--sc-ease-out), background var(--sc-d-fast) var(--sc-ease-out); }
+  .bar .cta:hover { color: var(--bone); background: #C0122C; }
+  .bar .cta:active { transform: scale(0.97); }
+  .status { color: var(--sc-ink-soft); }
+
+  /* ----------------------------------------------------------- film */
+  .film__stage { background: var(--sc-canvas); }
+  .film canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cap { position: absolute; z-index: 2; left: var(--sc-gutter); top: 50%; translate: 0 -50%;
+         width: min(30rem, 38vw); }
+  .cap h2, .cap h1 { font-size: var(--sc-t-4xl); }
+  .cap p { margin: var(--sc-5) 0 0; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.4; max-width: 30ch; text-wrap: pretty; }
+  .cap .mono { display: block; margin-bottom: var(--sc-4); }
+  .cap--hero { width: min(44rem, 46vw); }
+  .cap--hero h1 { font-size: clamp(4rem, 9.6vw, 10.5rem); letter-spacing: -0.055em; }
+  .cap--hero p { color: var(--sc-ink); font-size: var(--sc-t-xl); line-height: 1.2; max-width: 20ch; letter-spacing: -0.02em; }
+  .steps { position: absolute; z-index: 2; left: var(--sc-gutter); right: var(--sc-gutter); bottom: clamp(1.5rem, 5vh, 3rem);
+           display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sc-3); list-style: none; margin: 0; padding: 0; }
+  .steps li { padding-top: var(--sc-3); border-top: 1px solid var(--sc-hairline-strong); color: var(--sc-ink-soft);
+              font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); transition: color var(--sc-d-base) var(--sc-ease-out); position: relative; }
+  .steps li::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; background: var(--red);
+                      transform-origin: 0 50%; transform: scaleX(var(--f, 0)); }
+  .steps li.on { color: var(--sc-ink); }
+  .steps b { font-weight: 400; color: var(--red); margin-right: 0.6em; }
+
+  /* ------------------------------------------------------ manifesto */
+  .manifesto { padding-block: clamp(3rem, 10vh, 7rem) var(--sc-section); }
+  .m-line { font-size: clamp(3rem, 8.6vw, 9.5rem); }
+  .m-wipe { padding-block: 0.1em 0.14em; margin-block: -0.1em -0.14em; }
+  .m-wipe + .m-wipe { margin-top: clamp(2rem, 7vh, 5rem); }
+  .m-wipe--2 { text-align: right; }
+  .m-wipe--2 .m-line { color: var(--red); }
+  .m-wipe--3 { padding-left: 12vw; }
+
+  /* ----------------------------------------------------------- menu */
+  .menu { padding-block: var(--sc-section); border-top: 1px solid var(--sc-hairline); }
+  .menu__head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sc-6); align-items: end; margin-bottom: var(--sc-8); }
+  .menu__head h2 { font-size: var(--sc-t-4xl); }
+  .menu__head p { margin: 0; color: var(--sc-ink-soft); max-width: 42ch; justify-self: end; }
+  .proto { border-top: 1px solid var(--sc-hairline-strong); }
+  .proto__row { display: grid; grid-template-columns: minmax(10rem, 1.3fr) repeat(4, minmax(0, 1fr)); gap: var(--sc-5);
+                align-items: baseline; padding-block: var(--sc-6); border-bottom: 1px solid var(--sc-hairline-strong); }
+  .proto__row h3 { font-weight: 700; letter-spacing: -0.035em; font-size: var(--sc-t-2xl); line-height: 1; margin: 0; }
+  .proto__row dl { display: contents; }
+  .proto__row dt, .lab dt { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0 0 var(--sc-1); }
+  .proto__row dd, .lab dd { margin: 0; }
+  .lab { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sc-5); margin: var(--sc-7) 0 0; }
+  .lab > div { padding-top: var(--sc-4); border-top: 1px solid var(--sc-hairline); }
+  .lab dd.big { font-weight: 700; letter-spacing: -0.04em; font-size: var(--sc-t-3xl); line-height: 1; margin: var(--sc-2) 0 var(--sc-1); }
+  .menu__note { margin: var(--sc-7) 0 0; color: var(--sc-ink-soft); font-size: var(--sc-t-sm); }
+
+  /* ---------------------------------------------------------- rules */
+  .rules { padding-block: var(--sc-section); background: #0F1818; }
+  .rules__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--sc-7); align-items: start; }
+  .rules h2 { font-size: var(--sc-t-4xl); }
+  .rules ol { list-style: none; margin: 0; padding: 0; }
+  .rules li { display: flex; gap: var(--sc-4); align-items: baseline; padding-block: var(--sc-4); border-bottom: 1px solid var(--sc-hairline);
+              font-weight: 500; font-size: var(--sc-t-xl); letter-spacing: -0.025em; line-height: 1.15; }
+  .rules li::before { content: ""; flex: none; width: 0.4em; height: 0.4em; background: var(--red); transform: translateY(-0.06em); }
+  .rules li small { display: block; font-weight: 400; letter-spacing: 0; font-size: var(--sc-t-sm); color: var(--sc-ink-soft); margin-top: var(--sc-1); }
+
+  /* ---------------------------------------------------------- close */
+  .close { background: var(--red); color: var(--bone); --sc-ink: var(--bone); --sc-ink-soft: var(--bone);
+           --sc-accent: var(--bone); --sc-accent-ink: var(--red);
+           padding-block: clamp(5rem, 14vh, 9rem) var(--sc-6); position: relative; z-index: 2; }
+  .close__big { font-size: clamp(3.4rem, 11vw, 12rem); color: var(--sc-canvas); letter-spacing: -0.055em; }
+  .close__grid { display: grid; grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 1fr)); gap: var(--sc-7); margin-top: var(--sc-8); align-items: start; }
+  .come { display: inline-block; white-space: nowrap; font-weight: 700; letter-spacing: -0.045em; font-size: var(--sc-t-4xl); line-height: 0.95;
+          color: var(--sc-canvas); text-decoration: underline; text-decoration-thickness: 0.07em; text-underline-offset: 0.12em;
+          transition: transform var(--sc-d-fast) var(--sc-ease-out); }
+  .come:hover { transform: translateX(6px); }
+  .come:active { transform: translateX(6px) scale(0.98); }
+  .close h3 { font-family: var(--sc-font-mono); font-weight: 400; font-size: var(--sc-t-xs); margin: 0 0 var(--sc-3); }
+  .close p { margin: 0; }
+  .hours { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  .hours th { text-align: left; font-weight: 400; padding: 0.12em var(--sc-4) 0.12em 0; }
+  .hours td { text-align: right; }
+  .hours tr.today { font-weight: 700; }
+  .foot { margin-top: var(--sc-10); padding-top: var(--sc-5); border-top: 1px solid color-mix(in oklab, var(--bone) 40%, transparent);
+          display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sc-4); font-size: var(--sc-t-xs); }
+  .foot svg { width: 3.4rem; height: auto; }
+  .foot svg path { fill: var(--sc-canvas); fill-rule: evenodd; }
+  .close :focus-visible { outline-color: var(--sc-canvas); }
+
+  /* --------------------------------------------------------- mobile */
+  @media (max-width: 860px) {
+    .bar nav a:not(.cta), .status { display: none; }
+    .cap, .cap--hero { left: var(--sc-gutter); right: var(--sc-gutter); width: auto; top: auto; translate: none;
+                       bottom: calc(clamp(1.5rem, 5vh, 3rem) + 3.2rem); }
+    .cap h2 { font-size: var(--sc-t-3xl); }
+    .cap--hero h1 { font-size: 22vw; }
+    .cap p { font-size: var(--sc-t-base); margin-top: var(--sc-3); }
+    .cap--hero p { font-size: var(--sc-t-lg); }
+    .steps { gap: var(--sc-2); }
+    .steps li span { display: none; }
+    .m-wipe--3 { padding-left: 0; }
+    .menu__head, .rules__grid, .close__grid { grid-template-columns: 1fr; }
+    .menu__head p { justify-self: start; }
+    .proto__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .proto__row h3 { grid-column: 1 / -1; }
+    .lab { grid-template-columns: 1fr; }
+  }
+  @media (pointer: coarse) { .bar nav a { min-height: 44px; display: inline-flex; align-items: center; } }
+  @media (prefers-reduced-motion: reduce) { .steps li::before, .come, .bar .cta { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="bar">
+  <a class="mark" href="#main" aria-label="BRWLAB, back to top">
+    <svg viewBox="0 0 180 140" aria-hidden="true"><path d="M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z"/></svg>
+    <span>BRWLAB</span>
+  </a>
+  <nav aria-label="Site">
+    <span class="status" data-status>Kannur</span>
+    <a href="#menu">Menu</a>
+    <a href="#hours">Hours</a>
+    <a class="cta" href="#come-in">Come in</a>
+  </nav>
+</header>
+
+<main id="main" tabindex="-1">
+
+  <!-- 1 · The film: logo, bean, roast, grind, extract, cup -->
+  <section class="film" data-sc-act="pin" data-sc-span="9" data-sc-drift="#121C1C" data-film>
+    <div data-sc-stage class="film__stage">
+      <canvas aria-hidden="true" data-canvas></canvas>
+
+      <div class="cap cap--hero" data-sc-cue="0 0.1 0">
+        <h1 class="hd">BRWLAB</h1>
+        <p>An experimental lab designed to altr your everyday.</p>
+      </div>
+      <div class="cap" data-sc-cue="0.11 0.29 0.14 0.14">
+        <span class="mono">Kerala high-range, single origin</span>
+        <h2 class="hd">It starts as a specimen.</h2>
+        <p>Direct-source beans from Kerala's high-range farms. Batch numbers assigned. Provenance logged.</p>
+      </div>
+      <div class="cap" data-sc-cue="0.29 0.44 0.14 0.14">
+        <span class="mono">Batch rotation, bi-weekly</span>
+        <h2 class="hd">Roast.</h2>
+        <p>Heat, then time. Every batch documented and tested, and a new one every two weeks.</p>
+      </div>
+      <div class="cap" data-sc-cue="0.44 0.61 0.14 0.14">
+        <span class="mono">Grind, on site</span>
+        <h2 class="hd">Grind.</h2>
+        <p>Per order, at the counter, seconds before it meets water.</p>
+      </div>
+      <div class="cap" data-sc-cue="0.61 0.79 0.14 0.14">
+        <span class="mono">Water 92–96 °C, logged</span>
+        <h2 class="hd">Extract.</h2>
+        <p>Pressure, temperature, time. Every brew is a controlled variable. Not craft. Protocol.</p>
+      </div>
+      <div class="cap" data-sc-cue="0.79 1 0.1 0.03">
+        <span class="mono">Espresso, pour-over, cold</span>
+        <h2 class="hd">Observe.</h2>
+        <p>The cup is the data. You are the experiment.</p>
+      </div>
+
+      <ol class="steps" aria-label="The process" data-steps>
+        <li><b>01</b><span>Specimen</span></li>
+        <li><b>02</b><span>Roast</span></li>
+        <li><b>03</b><span>Grind</span></li>
+        <li><b>04</b><span>Extract</span></li>
+        <li><b>05</b><span>Cup</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 2 · Manifesto, wiped on -->
+  <section class="manifesto" data-sc-act="flow" data-sc-drift="#121C1C">
+    <div class="sc-wrap">
+      <div class="m-wipe" data-sc-reveal="right" data-sc-reveal-at="0.04 0.2">
+        <h2 class="hd m-line">Coffee is not comfort.</h2>
+      </div>
+      <div class="m-wipe m-wipe--2" data-sc-reveal="left" data-sc-reveal-at="0.2 0.38">
+        <p class="hd m-line">Coffee is a variable.</p>
+      </div>
+      <div class="m-wipe m-wipe--3" data-sc-reveal="right" data-sc-reveal-at="0.36 0.54">
+        <p class="hd m-line">We brew to know.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · The menu, as protocol -->
+  <section id="menu" class="menu" data-sc-act="flow" data-sc-drift="#142020">
+    <div class="sc-wrap">
+      <div class="menu__head" data-sc-in data-sc-stagger="70">
+        <h2 class="hd">What we pull.</h2>
+        <p>Three methods, one origin at a time. Every cup starts from the same protocol and ends on your tongue, where the data is.</p>
+      </div>
+      <div class="proto" data-sc-in data-sc-stagger="80">
+        <div class="proto__row">
+          <h3>Espresso</h3>
+          <dl>
+            <div><dt>Variable</dt><dd>Pressure</dd></div>
+            <div><dt>Origin</dt><dd>Kerala high-range, single</dd></div>
+            <div><dt>Grind</dt><dd>On site, per order</dd></div>
+            <div><dt>Batch</dt><dd>Rotates bi-weekly</dd></div>
+          </dl>
+        </div>
+        <div class="proto__row">
+          <h3>Pour-over</h3>
+          <dl>
+            <div><dt>Variable</dt><dd>Gravity and patience</dd></div>
+            <div><dt>Origin</dt><dd>Kerala high-range, single</dd></div>
+            <div><dt>Grind</dt><dd>On site, per order</dd></div>
+            <div><dt>Batch</dt><dd>Rotates bi-weekly</dd></div>
+          </dl>
+        </div>
+        <div class="proto__row">
+          <h3>Cold</h3>
+          <dl>
+            <div><dt>Variable</dt><dd>Time</dd></div>
+            <div><dt>Origin</dt><dd>Kerala high-range, single</dd></div>
+            <div><dt>Grind</dt><dd>On site, per order</dd></div>
+            <div><dt>Batch</dt><dd>Rotates bi-weekly</dd></div>
+          </dl>
+        </div>
+      </div>
+      <dl class="lab" data-sc-in data-sc-stagger="70">
+        <div><dt>Water temperature</dt><dd class="big">92–<span data-sc-count="80 96" data-sc-count-at="0.2 0.5">96</span> °C</dd><dd>Logged, every brew</dd></div>
+        <div><dt>Noise level</dt><dd class="big">Quiet</dd><dd>Functional</dd></div>
+        <div><dt>Capacity</dt><dd class="big">Limited</dd><dd>No reservations</dd></div>
+      </dl>
+      <!-- MENU PLACEHOLDER: swap in the owner's full menu and prices when shared -->
+      <p class="menu__note">Today's batch and prices are at the counter.</p>
+    </div>
+  </section>
+
+  <!-- 4 · House rules -->
+  <section class="rules" data-sc-act="flow" data-sc-drift="#0F1818">
+    <div class="sc-wrap rules__grid">
+      <h2 class="hd" data-sc-cue="0.1" data-sc-kinetic="words">Lab rules.</h2>
+      <ol data-sc-in data-sc-stagger="70">
+        <li><span>No ambient music requests.</span></li>
+        <li><span>No Wi-Fi passwords.</span></li>
+        <li><span>No oat milk substitutes.<small>Ask for altr.</small></span></li>
+        <li><span>No decaf.<small>We don't do that here.</small></span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 5 · The door -->
+  <section id="come-in" class="close" data-sc-act="flow">
+    <div class="sc-wrap">
+      <h2 class="hd close__big" data-sc-in>You are the experiment.</h2>
+      <div class="close__grid" data-sc-in data-sc-stagger="80">
+        <div>
+          <a class="come" href="https://maps.google.com/?cid=17869120411097649200" target="_blank" rel="noopener">Come in</a>
+          <p style="margin-top:var(--sc-4)">No reservations. Limited capacity. Quiet, functional.</p>
+        </div>
+        <div>
+          <h3>Location</h3>
+          <p>BRWLAB, near Fort Road<br>Kannur, North Kerala<br>India 670 001</p>
+          <p style="margin-top:var(--sc-3)"><a href="https://maps.google.com/?cid=17869120411097649200" target="_blank" rel="noopener">11.8745°N, 75.3704°E</a><br><a href="https://www.instagram.com/brwlab/" rel="noopener">@brwlab</a></p>
+        </div>
+        <div id="hours">
+          <h3>Hours</h3>
+          <table class="hours" data-hours>
+            <tr data-day="1"><th>Mon</th><td>07–18</td></tr>
+            <tr data-day="2"><th>Tue</th><td>07–18</td></tr>
+            <tr data-day="3"><th>Wed</th><td>07–18</td></tr>
+            <tr data-day="4"><th>Thu</th><td>07–18</td></tr>
+            <tr data-day="5"><th>Fri</th><td>07–18</td></tr>
+            <tr data-day="6"><th>Sat</th><td>07–18</td></tr>
+            <tr data-day="0"><th>Sun</th><td>09–17</td></tr>
+          </table>
+        </div>
+      </div>
+      <footer class="foot">
+        <svg viewBox="0 0 180 140" aria-hidden="true"><path d="M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z"/></svg>
+        <p>BRWLAB © 2024. Experimental coffee lab. Kannur, Kerala, India.</p>
+      </footer>
+    </div>
+  </section>
+
+</main>
+
+<script src="scrollcraft.js?v=20261001"></script>
+<script>ScrollCraft.mount(document.body);</script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+
+  /* ------------------------------------------------ open / closed, IST */
+  (function status() {
+    var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+    var get = function (t) { return (parts.find(function (p) { return p.type === t; }) || {}).value; };
+    var d = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    var now = (parseInt(get('hour'), 10) % 24) + parseInt(get('minute'), 10) / 60;
+    var open = function (x) { return x === 0 ? 9 : 7; }, shut = function (x) { return x === 0 ? 17 : 18; };
+    var pad = function (h) { return String(h).padStart(2, '0') + ':00'; }, txt;
+    if (now >= open(d) && now < shut(d)) txt = 'Open now, till ' + pad(shut(d));
+    else if (now < open(d)) txt = 'Closed. Opens ' + pad(open(d));
+    else { var n = (d + 1) % 7; txt = 'Closed. Opens ' + pad(open(n)) + (n === 0 ? ' Sunday' : ' tomorrow'); }
+    $('[data-status]').textContent = txt;
+    var row = $('[data-hours] tr[data-day="' + d + '"]');
+    if (row) row.classList.add('today');
+    setTimeout(status, 60000);
+  })();
+
+  /* ----------------------------------------------------- the film --
+     One set of grains, six arrangements. Scroll moves every grain from
+     one arrangement to the next: the logo, a raw bean, the roast, the
+     grounds, the extraction, the cup. */
+  var act = $('[data-film]'), cv = $('[data-canvas]'), ctx = cv.getContext('2d');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var small = matchMedia('(max-width: 860px)');
+  var N = small.matches ? 2600 : 4200;
+  var LOGO = 'M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z';
+
+  function rng(seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+  var R = rng(20240101);
+
+  // Rasterise a shape in a 1000x1000 design space and pick N points inside it.
+  var off = document.createElement('canvas'); off.width = off.height = 500;
+  var octx = off.getContext('2d', { willReadFrequently: true });
+  function sample(draw, n) {
+    octx.setTransform(1, 0, 0, 1, 0, 0);
+    octx.globalCompositeOperation = 'source-over';
+    octx.clearRect(0, 0, 500, 500);
+    octx.setTransform(0.5, 0, 0, 0.5, 0, 0);
+    octx.fillStyle = '#000'; octx.strokeStyle = '#000';
+    draw(octx);
+    var data = octx.getImageData(0, 0, 500, 500).data, pool = [];
+    for (var y = 0; y < 500; y++) for (var x = 0; x < 500; x++) if (data[(y * 500 + x) * 4 + 3] > 128) pool.push(x, y);
+    var out = new Float32Array(n * 2), m = pool.length / 2;
+    for (var i = 0; i < n; i++) {
+      var k = Math.floor(R() * m);
+      out[i * 2] = (pool[k * 2] + R()) * 2;
+      out[i * 2 + 1] = (pool[k * 2 + 1] + R()) * 2;
+    }
+    return out;
+  }
+  // Sort each arrangement the same way, so a grain travels to a nearby spot in the next shape.
+  function order(pts) {
+    var n = pts.length / 2, idx = [];
+    for (var i = 0; i < n; i++) idx.push(i);
+    var key = function (j) { var x = pts[j * 2] - 500, y = pts[j * 2 + 1] - 500; return Math.atan2(y, x) * 4000 + Math.hypot(x, y); };
+    idx.sort(function (a, b) { return key(a) - key(b); });
+    var o = new Float32Array(n * 2);
+    idx.forEach(function (j, i) { o[i * 2] = pts[j * 2]; o[i * 2 + 1] = pts[j * 2 + 1]; });
+    return o;
+  }
+
+  var logoPath = new Path2D(LOGO);
+  var S = {};
+  S.logo = order(sample(function (c) { c.translate(158, 234); c.scale(3.8, 3.8); c.fill(logoPath, 'evenodd'); }, N));
+  S.bean = order(sample(function (c) {
+    c.translate(500, 480); c.rotate(-0.42);
+    c.beginPath(); c.ellipse(0, 0, 215, 318, 0, 0, Math.PI * 2); c.fill();
+    c.globalCompositeOperation = 'destination-out';
+    c.lineWidth = 30; c.lineCap = 'round';
+    c.beginPath(); c.moveTo(4, -262); c.bezierCurveTo(-78, -110, 78, 110, -4, 262); c.stroke();
+  }, N));
+  S.grounds = order(sample(function (c) {
+    c.beginPath(); c.moveTo(150, 800); c.bezierCurveTo(300, 790, 380, 560, 500, 552);
+    c.bezierCurveTo(620, 560, 700, 790, 850, 800); c.closePath(); c.fill();
+  }, N));
+
+  // Extraction: most grains packed in the basket, some falling as the stream, a pool in the cup.
+  var nStream = Math.floor(N * 0.24), nPool = Math.floor(N * 0.12), nPuck = N - nStream - nPool;
+  var puckPts = order(sample(function (c) { c.beginPath(); c.roundRect(330, 200, 340, 92, 18); c.fill(); }, nPuck));
+  var poolPts = sample(function (c) { c.beginPath(); c.ellipse(500, 802, 160, 14, 0, 0, Math.PI * 2); c.fill(); }, nPool);
+  var cupPts = order(sample(function (c) {
+    c.beginPath(); c.moveTo(318, 560); c.lineTo(682, 560); c.lineTo(664, 740);
+    c.quadraticCurveTo(655, 812, 590, 816); c.lineTo(410, 816); c.quadraticCurveTo(345, 812, 336, 740); c.closePath(); c.fill();
+  }, N));
+  // Stream and pool grains are spread through the index range so the stream is fed from the whole shape.
+  var role = new Uint8Array(N), sPhase = new Float32Array(N);   // 0 puck, 1 stream, 2 pool
+  var ext = new Float32Array(N * 2), pi = 0, si = 0, qi = 0;
+  for (var i = 0; i < N; i++) {
+    var r = i % 100;
+    var want = r < 24 ? 1 : r < 36 ? 2 : 0;
+    if (want === 1 && si >= nStream) want = 0;
+    if (want === 2 && qi >= nPool) want = 0;
+    if (want === 0 && pi >= nPuck) want = si < nStream ? 1 : 2;
+    role[i] = want;
+    if (want === 0) { ext[i * 2] = puckPts[pi * 2]; ext[i * 2 + 1] = puckPts[pi * 2 + 1]; pi++; }
+    else if (want === 1) { sPhase[i] = R(); ext[i * 2] = 500 + (R() - 0.5) * 16; ext[i * 2 + 1] = 296 + sPhase[i] * 500; si++; }
+    else { ext[i * 2] = poolPts[qi * 2]; ext[i * 2 + 1] = poolPts[qi * 2 + 1]; qi++; }
+  }
+  S.extract = ext;
+  S.cup = cupPts;
+
+  // Colour per grain per arrangement. Shading gives the bean a body.
+  var hex = function (h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; };
+  function paint(pts, fn) {
+    var col = new Float32Array(N * 3);
+    for (var i = 0; i < N; i++) { var c = fn(pts[i * 2], pts[i * 2 + 1], i); col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2]; }
+    return col;
+  }
+  var mul = function (c, k) { return [c[0] * k, c[1] * k, c[2] * k]; };
+  function beanLight(x, y) {
+    var dx = (x - 470) / 250, dy = (y - 420) / 330, r = Math.min(1, Math.hypot(dx, dy));
+    return 1.14 - 0.66 * r * r + (R() - 0.5) * 0.16;
+  }
+  var RED = hex('#D91734'), RAW = hex('#A3AC72'), ROAST = hex('#6E3B1E'), GROUND = hex('#4C2B18'),
+      PUCK = hex('#3A2115'), STREAM = hex('#9A5427'), BREW = hex('#2C170D'), CREMA = hex('#C58642');
+  var C = {};
+  C.logo = paint(S.logo, function () { return mul(RED, 0.9 + R() * 0.18); });
+  C.bean = paint(S.bean, function (x, y) { return mul(RAW, beanLight(x, y)); });
+  C.roast = paint(S.bean, function (x, y) { return mul(ROAST, beanLight(x, y)); });
+  C.grounds = paint(S.grounds, function () { return mul(GROUND, 0.65 + R() * 0.7); });
+  C.extract = paint(S.extract, function (x, y, i) { return mul(role[i] === 1 ? STREAM : role[i] === 2 ? BREW : PUCK, 0.85 + R() * 0.3); });
+  C.cup = paint(S.cup, function (x, y) {
+    var t = Math.min(1, Math.max(0, (y - 562) / 60)), k = 0.88 + R() * 0.24;
+    return [(CREMA[0] * (1 - t) + BREW[0] * t) * k, (CREMA[1] * (1 - t) + BREW[1] * t) * k, (CREMA[2] * (1 - t) + BREW[2] * t) * k];
+  });
+
+  var delay = new Float32Array(N), sway = new Float32Array(N);
+  for (i = 0; i < N; i++) { delay[i] = R(); sway[i] = (R() - 0.5) * 2; }
+
+  // The timeline, in film progress: [at, shape, colour].
+  var K = [
+    [0.00, 'logo', 'logo'], [0.07, 'logo', 'logo'], [0.20, 'bean', 'bean'], [0.27, 'bean', 'bean'],
+    [0.38, 'bean', 'roast'], [0.43, 'bean', 'roast'], [0.56, 'grounds', 'grounds'], [0.61, 'grounds', 'grounds'],
+    [0.73, 'extract', 'extract'], [0.80, 'extract', 'extract'], [0.92, 'cup', 'cup'], [1.00, 'cup', 'cup']
+  ];
+  var STEPS = [[0.12, 0.29], [0.29, 0.44], [0.44, 0.61], [0.61, 0.80], [0.80, 1.0]];
+
+  var W = 0, H = 0, dpr = 1, sc = 1, ox = 0, oy = 0, size = 2;
+  var target = 0, shown = -1, cur = 0, on = true, last = 0;
+  function layout() {
+    var d = Math.min(2, devicePixelRatio || 1);
+    if (cv.clientWidth === W && cv.clientHeight === H && d === dpr) return;   // a phone toolbar moved; the stage did not
+    dpr = d;
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    if (small.matches) { sc = Math.min(W * 0.92, H * 0.52) / 1000; ox = W / 2 - 500 * sc; oy = H * 0.33 - 500 * sc; }
+    else { sc = Math.min(H * 0.82, W * 0.5) / 1000; ox = W * 0.66 - 500 * sc; oy = H * 0.5 - 500 * sc; }
+    size = Math.max(1.6, 4.4 * sc) * dpr;
+    shown = -1;
+  }
+
+  var ease = function (t) { return t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t); };
+  var cl = function (t) { return t < 0 ? 0 : t > 1 ? 1 : t; };
+  // A slow camera per arrangement, a function of scroll alone, so a held shape still moves:
+  // the bean turns, the grounds and the cup push in. [centre x, centre y, angle, scale]
+  function cam(nm, p) {
+    if (nm === 'bean') { var b = cl((p - 0.14) / 0.34); return [500, 480, -0.14 + 0.32 * b, 1 + 0.05 * b]; }
+    if (nm === 'grounds') return [500, 720, 0, 1 + 0.08 * cl((p - 0.5) / 0.18)];
+    if (nm === 'cup') return [500, 700, 0, 1 + 0.05 * cl((p - 0.86) / 0.14)];
+    return null;
+  }
+  var stageEl = document.querySelector('.film__stage'), lastSig = '';
+  var stepEls = document.querySelectorAll('[data-steps] li'), stepCache = [];
+
+  function draw(p, now) {
+    var a = K[0], b = K[K.length - 1];
+    for (var k = 0; k < K.length - 1; k++) if (p >= K[k][0] && p <= K[k + 1][0]) { a = K[k]; b = K[k + 1]; break; }
+    var t = b[0] > a[0] ? (p - a[0]) / (b[0] - a[0]) : 0;
+    if (reduce.matches) t = t < 0.5 ? 0 : 1;
+    var P0 = S[a[1]], P1 = S[b[1]], C0 = C[a[2]], C1 = C[b[2]];
+    var m0 = cam(a[1], p), m1 = cam(b[1], p);
+    var c0 = m0 ? Math.cos(m0[2]) * m0[3] : 1, s0 = m0 ? Math.sin(m0[2]) * m0[3] : 0;
+    var c1 = m1 ? Math.cos(m1[2]) * m1[3] : 1, s1 = m1 ? Math.sin(m1[2]) * m1[3] : 0;
+    var moving = P0 !== P1, recolour = a[2] !== b[2];
+    var flowing = b[1] === 'extract' || (a[1] === 'extract' && t < 0.5);
+    var heat = recolour && !moving ? Math.sin(t * Math.PI) : 0;
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    // The cup outline arrives with the extraction.
+    var cupA = p < 0.62 ? 0 : Math.min(1, (p - 0.62) / 0.1);
+    if (cupA > 0) {
+      var mc = cam('cup', p), k2 = mc[3];
+      ctx.setTransform(sc * dpr * k2, 0, 0, sc * dpr * k2, (ox + (mc[0] - mc[0] * k2) * sc) * dpr, (oy + (mc[1] - mc[1] * k2) * sc) * dpr);
+      ctx.strokeStyle = 'rgba(238,243,241,' + (0.5 * cupA).toFixed(3) + ')';
+      ctx.lineWidth = 1.6 / sc;
+      ctx.beginPath(); ctx.moveTo(306, 548); ctx.lineTo(694, 548); ctx.lineTo(676, 744);
+      ctx.quadraticCurveTo(666, 828, 594, 830); ctx.lineTo(406, 830); ctx.quadraticCurveTo(334, 828, 324, 744); ctx.closePath(); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(690, 600); ctx.bezierCurveTo(782, 598, 792, 722, 672, 732); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(236, 862); ctx.lineTo(764, 862); ctx.stroke();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+
+    // At rest the logo is the solid mark. It breaks into grains as the scroll starts.
+    var solid = 1 - ease((p - 0.012) / 0.05);
+    if (solid > 0) {
+      ctx.globalAlpha = solid;
+      ctx.setTransform(3.8 * sc * dpr, 0, 0, 3.8 * sc * dpr, (ox + 158 * sc) * dpr, (oy + 234 * sc) * dpr);
+      ctx.fillStyle = '#D91734'; ctx.fill(logoPath, 'evenodd');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    ctx.globalAlpha = 1 - solid;
+
+    var s = size, half = s / 2, lastFill = '';
+    for (var i = 0; i < N; i++) {
+      var ti = moving ? ease((t - delay[i] * 0.35) / 0.65) : t;
+      var x0 = P0[i * 2], y0 = P0[i * 2 + 1], x1 = P1[i * 2], y1 = P1[i * 2 + 1], u, v;
+      if (m0) { u = x0 - m0[0]; v = y0 - m0[1]; x0 = m0[0] + u * c0 - v * s0; y0 = m0[1] + u * s0 + v * c0; }
+      if (m1) { u = x1 - m1[0]; v = y1 - m1[1]; x1 = m1[0] + u * c1 - v * s1; y1 = m1[1] + u * s1 + v * c1; }
+      var x = x0 + (x1 - x0) * ti, y = y0 + (y1 - y0) * ti;
+      if (moving) x += Math.sin(ti * Math.PI) * sway[i] * 60;
+      if (heat) { x += Math.sin(now * 0.004 + i) * 1.8 * heat; y += Math.cos(now * 0.005 + i * 1.3) * 1.8 * heat; }
+      if (role[i] === 1 && flowing) {
+        var fy = 296 + ((sPhase[i] + p * 14 + now * 0.00035) % 1) * 500;
+        var w = !moving ? 1 : b[1] === 'extract' ? ti : 1 - ti;   // blend in and out of the flowing stream
+        y = y * (1 - w) + fy * w;
+      }
+      var m = recolour ? t : ti;
+      var fill = 'rgb(' + ((C0[i * 3] + (C1[i * 3] - C0[i * 3]) * m) | 0) + ',' +
+                          ((C0[i * 3 + 1] + (C1[i * 3 + 1] - C0[i * 3 + 1]) * m) | 0) + ',' +
+                          ((C0[i * 3 + 2] + (C1[i * 3 + 2] - C0[i * 3 + 2]) * m) | 0) + ')';
+      if (fill !== lastFill) { ctx.fillStyle = fill; lastFill = fill; }
+      ctx.fillRect((ox + x * sc) * dpr - half, (oy + y * sc) * dpr - half, s, s);
+    }
+
+    // The step rail. Written only when a value changes.
+    for (var q = 0; q < STEPS.length; q++) {
+      var f = Math.max(0, Math.min(1, (p - STEPS[q][0]) / (STEPS[q][1] - STEPS[q][0])));
+      var fv = f.toFixed(2), onq = p >= STEPS[q][0] && (p < STEPS[q][1] || q === 4);
+      if (!stepCache[q] || stepCache[q][0] !== fv || stepCache[q][1] !== onq) {
+        stepCache[q] = [fv, onq];
+        stepEls[q].style.setProperty('--f', fv);
+        stepEls[q].classList.toggle('on', onq);
+      }
+    }
+    ctx.globalAlpha = 1;
+    // Tell the verification harness what actually paints: arrangement, blend, camera.
+    var sig = a[1] + '>' + b[1] + ':' + t.toFixed(2) + ':' + (m0 ? m0[2].toFixed(2) + ',' + m0[3].toFixed(3) : '') + ':' + solid.toFixed(2);
+    if (sig !== lastSig) { lastSig = sig; stageEl.setAttribute('data-sc-verify-state', sig); }
+  }
+
+  function frame(now) {
+    if (on) {
+      target = parseFloat(act.style.getPropertyValue('--sc-p')) || 0;
+      var dt = Math.min(100, now - (last || now)); last = now;
+      cur += (target - cur) * (reduce.matches ? 1 : 1 - Math.pow(1 - 0.14, dt / 16.667));
+      if (Math.abs(target - cur) < 0.0002) cur = target;
+      var live = !reduce.matches && ((cur > 0.27 && cur < 0.43) || (cur > 0.61 && cur < 0.86));   // heat shimmer and the running stream
+      if (Math.abs(cur - shown) > 0.00005 || live) { draw(cur, reduce.matches ? 0 : now); shown = cur; }
+    } else last = 0;
+    requestAnimationFrame(frame);
+  }
+  new IntersectionObserver(function (e) { on = e[0].isIntersecting; }).observe(act);
+  addEventListener('resize', layout);
+  small.addEventListener('change', layout);
+  layout();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BRWLAB, an experimental coffee lab in Kannur</title>
+<meta name="description" content="BRWLAB is an experimental coffee lab near Fort Road, Kannur. Single-origin Kerala coffee, ground per order and extracted by protocol. You are the experiment.">
+<meta name="theme-color" content="#121C1C">
+<!-- DEPLOY STEP: add og:url and og:image with the live absolute URL -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 140'%3E%3Cpath fill='%23D91734' fill-rule='evenodd' d='M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/NeueMontreal-Bold.otf" as="font" type="font/otf" crossorigin>
+<link rel="stylesheet" href="scrollcraft.css?v=20261001">
+<style>
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Regular.otf") format("opentype"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Medium.otf") format("opentype"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Neue Montreal"; src: url("assets/fonts/NeueMontreal-Bold.otf") format("opentype"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Vin Mono Pro"; src: url("assets/fonts/VinMonoPro-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+
+  :root {
+    --sc-canvas:     #121C1C;
+    --sc-surface:    #1A2828;
+    --sc-ink:        #EEF3F1;
+    --sc-ink-soft:   #93A8A4;
+    --sc-accent:     #D91734;
+    --sc-accent-ink: #FFF6F4;
+    --sc-font-display: "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+    --sc-font-text:    "Neue Montreal", "Helvetica Neue", Arial, sans-serif;
+    --sc-font-mono:    "Vin Mono Pro", ui-monospace, monospace;
+    --sc-r-sm: 3px;
+    --red: #D91734;
+    --bone: #FFF6F4;
+  }
+  html { background: var(--sc-canvas); overflow-x: hidden; overflow-x: clip; scroll-behavior: auto; }
+  body { overflow-x: hidden; overflow-x: clip; letter-spacing: 0; }
+  .skip { position: fixed; left: var(--sc-4); top: var(--sc-4); z-index: 100; padding: var(--sc-2) var(--sc-3);
+          background: var(--sc-ink); color: var(--sc-canvas); transform: translateY(-200%); }
+  .skip:focus { transform: none; }
+
+  .hd { font-family: var(--sc-font-display); font-weight: 700; letter-spacing: -0.045em; line-height: 0.9; margin: 0; text-wrap: balance; }
+  .mono { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); letter-spacing: 0.02em; color: var(--sc-ink-soft); }
+
+  /* ------------------------------------------------------------- bar */
+  .bar { position: fixed; z-index: var(--sc-z-chrome); inset: 0 0 auto 0; display: flex; align-items: center;
+         justify-content: space-between; gap: var(--sc-4);
+         padding: calc(var(--sc-4) + env(safe-area-inset-top, 0px)) var(--sc-gutter) var(--sc-4); pointer-events: none; }
+  .bar > * { pointer-events: auto; }
+  .mark { display: inline-flex; align-items: center; gap: var(--sc-3); text-decoration: none; }
+  .mark svg { width: 2.1rem; height: auto; }
+  .mark svg path { fill: var(--red); fill-rule: evenodd; }
+  .mark span { font-weight: 700; letter-spacing: -0.04em; font-size: 1.25rem; }
+  .bar nav { display: flex; align-items: baseline; gap: var(--sc-5); font-size: var(--sc-t-sm); }
+  /* Same button as the one at the door: bold, text centred in its box at any height. */
+  .bar .cta { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: 0 1em;
+              background: var(--red); color: var(--bone); border-radius: var(--sc-r-sm); text-decoration: none;
+              font-weight: 700; letter-spacing: -0.01em; line-height: 1; white-space: nowrap;
+              transition: background var(--sc-d-fast) var(--sc-ease-out), transform var(--sc-d-fast) var(--sc-ease-out); }
+  .bar .cta:hover { background: #C0122C; }
+  .bar .cta:active { transform: scale(0.97); }
+  .status { color: var(--sc-ink-soft); }
+  .brand { display: flex; flex-direction: column; align-items: flex-start; }
+  .brand__status { display: none; }
+
+  /* ------------------------------------------------------ the world */
+  .world canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100vh; height: 100lvh; max-width: none;
+                  opacity: 0; transition: opacity 700ms var(--sc-ease-out); }
+  .world canvas.on { opacity: 1; }                 /* the grains fade in on their first frame instead of popping */
+  /* The flat mark only appears if the 3D scene cannot run at all. */
+  .world__fallback { display: none; position: absolute; right: 12vw; top: 50%; width: min(34vw, 26rem); translate: 0 -50%; }
+  .world__fallback path { fill: var(--red); fill-rule: evenodd; }
+  .no-gl .world__fallback { display: block; }
+
+  /* ------------------------------------------------------------ copy */
+  .scrim { position: absolute; inset: 0; pointer-events: none;
+           background: linear-gradient(90deg, color-mix(in oklab, var(--sc-canvas) 78%, transparent) 0%, color-mix(in oklab, var(--sc-canvas) 40%, transparent) 30%, transparent 48%); }
+  .cap { position: absolute; left: var(--sc-gutter); top: 50%; translate: 0 -50%; width: min(31rem, 38vw); }
+  .cap h2, .cap h1 { font-size: var(--sc-t-4xl); }
+  .cap p { margin: var(--sc-5) 0 0; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.4; max-width: 30ch; text-wrap: pretty; }
+  .cap .mono { display: block; margin-bottom: var(--sc-4); }
+  .cap--hero { width: min(46rem, 46vw); }
+  .cap--hero h1 { font-size: clamp(4rem, 10.5vw, 11.5rem); letter-spacing: -0.055em; }
+  .cap--hero p { color: var(--sc-ink); font-size: var(--sc-t-xl); line-height: 1.2; max-width: 20ch; letter-spacing: -0.02em; }
+  .menu-list { list-style: none; margin: var(--sc-6) 0 0; padding: 0; border-top: 1px solid var(--sc-hairline-strong); }
+  .menu-list li { display: grid; grid-template-columns: 1fr auto; gap: var(--sc-4); align-items: baseline;
+                  padding-block: var(--sc-3); border-bottom: 1px solid var(--sc-hairline-strong); }
+  .menu-list b { font-weight: 700; letter-spacing: -0.035em; font-size: var(--sc-t-xl); }
+  .menu-list span { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .cap .fine { font-size: var(--sc-t-sm); margin-top: var(--sc-4); }
+  .rules { list-style: none; margin: var(--sc-5) 0 0; padding: 0; }
+  .rules li { display: flex; gap: var(--sc-3); align-items: baseline; padding-block: var(--sc-3); border-bottom: 1px solid var(--sc-hairline);
+              font-weight: 500; font-size: var(--sc-t-lg); letter-spacing: -0.02em; }
+  .rules li::before { content: ""; flex: none; width: 0.4em; height: 0.4em; background: var(--red); translate: 0 -0.06em; }
+  .rules small { display: block; color: var(--sc-ink-soft); font-weight: 400; font-size: var(--sc-t-sm); letter-spacing: 0; margin-top: 2px; }
+
+  .cap--visit { width: min(36rem, 42vw); }
+  .come { display: inline-flex; align-items: center; margin-top: var(--sc-5); padding: 0.6em 1em; background: var(--red); color: var(--bone);
+          font-weight: 700; letter-spacing: -0.03em; font-size: var(--sc-t-lg); line-height: 1; text-decoration: none; border-radius: var(--sc-r-sm);
+          white-space: nowrap; transition: background var(--sc-d-fast) var(--sc-ease-out), transform var(--sc-d-fast) var(--sc-ease-out); }
+  .come:hover { background: #C0122C; }
+  .come:active { transform: scale(0.97); }
+  .visit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sc-5); margin-top: var(--sc-6); font-size: var(--sc-t-sm); }
+  .visit h3 { font-family: var(--sc-font-mono); font-weight: 400; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); margin: 0 0 var(--sc-2); }
+  .visit p { margin: 0; color: var(--sc-ink); font-size: var(--sc-t-sm); line-height: 1.5; max-width: none; }
+  .hours { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  .hours th { text-align: left; font-weight: 400; padding: 0 var(--sc-3) 0 0; }
+  .hours td { text-align: right; }
+  .hours tr.today { font-weight: 700; color: var(--bone); }
+  .hours--short { display: none; }
+
+  /* ---------------------------------------------------------- stops */
+  /* A quick cover for jumps between distant stops, so the page lands instead of flying. */
+  .curtain { position: fixed; inset: 0; z-index: 55; background: var(--sc-canvas); opacity: 0; pointer-events: none;
+             transition: opacity 170ms var(--sc-ease-out); }
+  .curtain.on { opacity: 1; }
+  .map { position: fixed; z-index: var(--sc-z-chrome); right: var(--sc-gutter); top: 50%; translate: 0 -50%; }
+  .map__list { list-style: none; margin: 0; padding: 0; display: grid; width: 10rem; }   /* one width, so the numbers form a column */
+  .map__stop { all: unset; box-sizing: border-box; cursor: pointer; display: grid; width: 100%; grid-template-columns: 1fr 1.5rem 2.4rem;
+               align-items: center; justify-items: end; gap: var(--sc-3); min-height: 1.9rem; padding-left: var(--sc-5);
+               font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+  .map__label { white-space: nowrap; opacity: 0; translate: 6px 0;
+                transition: opacity var(--sc-d-base) var(--sc-ease-out), translate var(--sc-d-base) var(--sc-ease-out), color var(--sc-d-fast) var(--sc-ease-out); }
+  .map__tick { position: relative; width: 100%; height: 2px; background: var(--sc-hairline-strong); overflow: hidden; }
+  .map__tick i { position: absolute; inset: 0; background: var(--red); transform-origin: 0 50%; transform: scaleX(var(--fill, 0)); }
+  .map__stop.is-past .map__num { color: var(--sc-ink); }
+  .map__stop[aria-current="step"] .map__num { color: var(--red); }
+  .map__stop[aria-current="step"] .map__tick { height: 3px; }
+  /* Labels stay out of the way while you read: the current stop, Menu and Visit always show;
+     the rest appear when you reach for the list. */
+  .map__stop[aria-current="step"] .map__label, .map__stop.is-key .map__label,
+  .map:hover .map__label, .map:focus-within .map__label { opacity: 1; translate: 0 0; }
+  .map__stop[aria-current="step"] .map__label, .map__stop:hover .map__label, .map__stop:focus-visible .map__label { color: var(--sc-ink); }
+  .map__stop:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; border-radius: 2px; }
+  .map__toggle { display: none; }
+  /* While you use the list it gets a quiet backing, so labels never sit on top of the grains. */
+  .map::before { content: ""; position: absolute; inset: -0.75rem -0.75rem -0.75rem -0.5rem; z-index: -1; pointer-events: none;
+                 background: color-mix(in oklab, var(--sc-canvas) 84%, transparent); border-radius: var(--sc-r-sm);
+                 opacity: 0; transition: opacity var(--sc-d-base) var(--sc-ease-out); }
+  .map:hover::before, .map:focus-within::before { opacity: 1; }
+
+  /* --------------------------------------------------------- mobile */
+  @media (max-width: 860px) {
+    .status { display: none; }
+    /* Phones: the open/closed line sits under the logo, lined up with the wordmark; tap it for the hours. */
+    .brand__status { display: block; padding: 2px 0 4px calc(2.1rem + var(--sc-3)); font-size: var(--sc-t-xs);
+                     color: var(--sc-ink-soft); text-decoration: none; line-height: 1.2; }
+    .scrim { background: linear-gradient(0deg, color-mix(in oklab, var(--sc-canvas) 88%, transparent) 0%, color-mix(in oklab, var(--sc-canvas) 55%, transparent) 38%, transparent 58%); }
+    .cap, .cap--hero, .cap--visit { left: var(--sc-gutter); right: var(--sc-gutter); width: auto; top: auto; translate: none; bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px)); }   /* clear of the stops bar */
+    .cap h2 { font-size: var(--sc-t-3xl); }
+    .cap--hero h1 { font-size: 21vw; }
+    .cap p { font-size: var(--sc-t-base); margin-top: var(--sc-3); }
+    .cap--hero p { font-size: var(--sc-t-lg); }
+    .come { font-size: var(--sc-t-base); margin-top: var(--sc-4); }
+    .visit { margin-top: var(--sc-4); gap: var(--sc-4); }
+    .map { top: auto; translate: none; left: var(--sc-gutter); right: var(--sc-gutter); bottom: calc(var(--sc-2) + env(safe-area-inset-bottom, 0px)); }
+    .map__toggle { all: unset; box-sizing: border-box; cursor: pointer; position: relative; display: flex; width: 100%; min-height: 44px;
+                   align-items: center; justify-content: space-between; gap: var(--sc-3); border-top: 1px solid var(--sc-hairline-strong);
+                   font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+    .map__toggle::before { content: ""; position: absolute; left: 0; top: -1px; height: 1px; width: 100%; background: var(--red);
+                           transform-origin: 0 50%; transform: scaleX(var(--route, 0)); }
+    .map__toggle b { color: var(--sc-ink); font-weight: 400; }
+    .map__all { display: inline-flex; align-items: center; gap: var(--sc-2); color: var(--sc-ink); }
+    .map__all svg { width: 0.8rem; height: auto; transition: rotate var(--sc-d-base) var(--sc-ease-out); }
+    .map.open .map__all svg { rotate: 180deg; }
+    .map__toggle:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+    .map__list { position: absolute; left: 0; right: 0; width: auto; bottom: calc(100% + var(--sc-2)); display: none; max-height: 70svh; overflow: auto;
+                 padding: var(--sc-2); background: var(--sc-surface); border: 1px solid var(--sc-hairline-strong); border-radius: var(--sc-r-sm);
+                 box-shadow: var(--sc-e3), var(--sc-edge); }
+    .map.open .map__list { display: grid; }
+    .map__stop { width: 100%; grid-template-columns: 2rem 1fr 2.4rem; justify-items: start; min-height: 44px; padding: 0 var(--sc-3); }
+    .map__num { order: -1; }
+    .map::before { display: none; }
+    .map__label { opacity: 1; translate: none; font-family: var(--sc-font-text); font-size: var(--sc-t-base); color: var(--sc-ink); }
+    .map__stop[aria-current="step"] { background: color-mix(in oklab, var(--red) 14%, transparent); border-radius: var(--sc-r-sm); }
+    .world__fallback { right: 50%; translate: 50% 0; top: 16vh; width: 56vw; }
+  }
+  /* Short phone screens (most iPhones with Safari's toolbars): keep the location and the hours,
+     show the hours in two lines, and drop only the longer intro paragraphs of the other stops. */
+  @media (max-width: 860px) and (max-height: 700px) {
+    .cap > p:not(.fine) { display: none; }
+    .hours[data-hours] { display: none; }
+    .hours--short { display: table; }
+    .cap--visit h2 { font-size: var(--sc-t-2xl); }
+  }
+  @media (pointer: coarse) { .map__stop, .bar .cta { min-height: 44px; } }
+  @media (prefers-reduced-motion: reduce) { .map__label, .map__all svg, .curtain, .come, .bar .cta { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#visit">Skip to visit details</a>
+<div class="sc-grain" aria-hidden="true"></div>
+
+<header class="bar">
+  <div class="brand">
+  <a class="mark" href="#top" data-jump="0" aria-label="BRWLAB, back to the start">
+    <svg viewBox="0 0 180 140" aria-hidden="true"><path d="M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z"/></svg>
+    <span>BRWLAB</span>
+  </a>
+  <a class="brand__status" href="#visit" data-jump="9" data-status aria-label="Opening hours"></a>
+  </div>
+  <nav aria-label="Site">
+    <span class="status" data-status></span>
+    <a class="cta" href="#visit" data-jump="9">Come in</a>
+  </nav>
+</header>
+
+<!-- The stops: every waypoint of the flight. Click one to land on it. -->
+<nav class="map" aria-label="Stops" data-mapnav>
+  <ol class="map__list" id="stops" data-map>
+    <li><button type="button" class="map__stop" data-jump="0"><span class="map__label">Start</span><span class="map__num">00</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="1"><span class="map__label">Specimen</span><span class="map__num">01</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="2"><span class="map__label">Roast</span><span class="map__num">02</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="3"><span class="map__label">Grind</span><span class="map__num">03</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="4"><span class="map__label">Extract</span><span class="map__num">04</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="5"><span class="map__label">Cup</span><span class="map__num">05</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop is-key" data-jump="6"><span class="map__label">Methods</span><span class="map__num">06</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="7"><span class="map__label">Lab data</span><span class="map__num">07</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop" data-jump="8"><span class="map__label">Rules</span><span class="map__num">08</span><span class="map__tick"><i></i></span></button></li>
+    <li><button type="button" class="map__stop is-key" data-jump="9"><span class="map__label">Visit</span><span class="map__num">09</span><span class="map__tick"><i></i></span></button></li>
+  </ol>
+  <button type="button" class="map__toggle" aria-expanded="false" aria-controls="stops" data-toggle>
+    <span data-now><b>00</b> Start</span>
+    <span class="map__all">All stops <svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 7l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg></span>
+  </button>
+</nav>
+<div class="curtain" aria-hidden="true" data-curtain></div>
+
+<main id="top">
+<div data-sc-mode="worldflight" data-sc-seam="0.02" data-world-root>
+
+  <div data-sc-world class="world">
+    <!-- Legs carry the timeline only. The grains are drawn by the canvas below. -->
+    <div data-sc-segment data-sc-w="1.2" data-sc-waypoint="Lab"></div>
+    <div data-sc-segment data-sc-w="1.3" data-sc-waypoint="Specimen"></div>
+    <div data-sc-segment data-sc-w="1.1" data-sc-waypoint="Roast"></div>
+    <div data-sc-segment data-sc-w="1.8" data-sc-waypoint="Grind"></div>
+    <div data-sc-segment data-sc-w="1.3" data-sc-waypoint="Extract"></div>
+    <div data-sc-segment data-sc-w="1.3" data-sc-waypoint="Cup"></div>
+    <div data-sc-segment data-sc-w="1.9" data-sc-waypoint="Methods"></div>
+    <div data-sc-segment data-sc-w="1.0" data-sc-waypoint="Data"></div>
+    <div data-sc-segment data-sc-w="1.0" data-sc-waypoint="Rules"></div>
+    <div data-sc-segment data-sc-w="1.3" data-sc-waypoint="Visit"></div>
+    <canvas aria-hidden="true" data-gl data-sc-verify-state=""></canvas>
+    <svg class="world__fallback" viewBox="0 0 180 140" aria-hidden="true"><path d="M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z"/></svg>
+  </div>
+
+  <div data-sc-world-copy>
+    <div class="scrim" aria-hidden="true"></div>
+
+    <div class="cap cap--hero" data-sc-copy data-sc-window="hero">
+      <h1 class="hd">BRWLAB</h1>
+      <p>An experimental lab designed to altr your everyday.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.122 0.194 0.16 0.16">
+      <span class="mono">Kerala high-range, single origin</span>
+      <h2 class="hd">It starts as a specimen.</h2>
+      <p>Direct-source beans from Kerala's high-range farms. Batch numbers assigned. Provenance logged.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.216 0.277 0.16 0.16">
+      <span class="mono">Batch rotation, bi-weekly</span>
+      <h2 class="hd">Roast.</h2>
+      <p>Heat, then time. Every batch documented and tested, and a new one every two weeks.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.33 0.414 0.16 0.16">
+      <span class="mono">Grind, on site</span>
+      <h2 class="hd">Grind.</h2>
+      <p>Per order, at the counter, seconds before it meets water.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.441 0.512 0.16 0.16">
+      <span class="mono">Water 92–96 °C, logged</span>
+      <h2 class="hd">Extract.</h2>
+      <p>Pressure, temperature, time. Every brew is a controlled variable. Not craft. Protocol.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.539 0.611 0.16 0.16">
+      <span class="mono">The cup is the data</span>
+      <h2 class="hd">Observe.</h2>
+      <p>We observe. You consume. The data is in the cup.</p>
+    </div>
+    <div class="cap" id="methods" data-sc-copy data-sc-window="0.652 0.755 0.14 0.14">
+      <span class="mono">Brew methods</span>
+      <h2 class="hd">What we pull.</h2>
+      <ul class="menu-list">
+        <li><b>Espresso</b><span>Pressure</span></li>
+        <li><b>Pour-over</b><span>Gravity and patience</span></li>
+        <li><b>Cold</b><span>Time</span></li>
+      </ul>
+      <!-- MENU PLACEHOLDER: swap in the owner's full menu and prices when shared -->
+      <p class="fine">Kerala high-range, single origin. Ground on site, per order. Today's batch and prices are at the counter.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.774 0.83 0.16 0.16">
+      <span class="mono">Lab data</span>
+      <h2 class="hd">Logged, every brew.</h2>
+      <p>Water between 92 and 96 °C. Noise level quiet, functional. Capacity limited, no reservations.</p>
+    </div>
+    <div class="cap" data-sc-copy data-sc-window="0.85 0.906 0.16 0.16">
+      <h2 class="hd">Lab rules.</h2>
+      <ul class="rules">
+        <li><span>No ambient music requests.</span></li>
+        <li><span>No Wi-Fi passwords.</span></li>
+        <li><span>No oat milk substitutes.<small>Ask for altr.</small></span></li>
+        <li><span>No decaf.<small>We don't do that here.</small></span></li>
+      </ul>
+    </div>
+    <div class="cap cap--visit" id="visit" data-sc-copy data-sc-window="finale">
+      <h2 class="hd">You are the experiment.</h2>
+      <a class="come" href="https://maps.google.com/?cid=17869120411097649200" target="_blank" rel="noopener">Come in</a>
+      <div class="visit">
+        <div>
+          <h3>Location</h3>
+          <p>BRWLAB, near Fort Road<br>Kannur, North Kerala 670 001<br><a href="https://maps.google.com/?cid=17869120411097649200" target="_blank" rel="noopener">11.8745°N, 75.3704°E</a><br><a href="https://www.instagram.com/brwlab/" rel="noopener">@brwlab</a></p>
+        </div>
+        <div>
+          <h3>Hours</h3>
+          <table class="hours" data-hours>
+            <tr data-day="1"><th>Mon</th><td>07–18</td></tr><tr data-day="2"><th>Tue</th><td>07–18</td></tr>
+            <tr data-day="3"><th>Wed</th><td>07–18</td></tr><tr data-day="4"><th>Thu</th><td>07–18</td></tr>
+            <tr data-day="5"><th>Fri</th><td>07–18</td></tr><tr data-day="6"><th>Sat</th><td>07–18</td></tr>
+            <tr data-day="0"><th>Sun</th><td>09–17</td></tr>
+          </table>
+          <table class="hours hours--short" aria-hidden="true">
+            <tr data-days="1-6"><th>Mon–Sat</th><td>07–18</td></tr>
+            <tr data-days="0"><th>Sun</th><td>09–17</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div data-sc-spacer aria-hidden="true"></div>
+</div>
+</main>
+
+<script src="scrollcraft.js?v=20261001"></script>
+<script>ScrollCraft.mount(document);</script>
+
+<script>
+/* =====================================================================
+   The world. About 16,000 grains in a perspective scene. Every waypoint
+   is one arrangement of the same grains; the vertex shader moves each
+   grain from the previous arrangement to the current one, so the GPU does
+   the morph and the page only uploads a few numbers per frame.
+   Colours are BRWLAB's own: red, bone, teal, on teal-black. No brown.
+   ===================================================================== */
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  var small = matchMedia('(max-width: 860px)');
+  var fine = matchMedia('(hover: hover) and (pointer: fine)');
+
+  /* ----------------------------------------------------------- track */
+  var root = $('[data-world-root]');
+  var legs = $$('[data-sc-segment]').map(function (el) { return parseFloat(el.getAttribute('data-sc-w')) || 1; });
+  var c0 = [], acc = 0;
+  legs.forEach(function (w) { c0.push(acc); acc += w; });
+  var TOTAL = acc;
+  // The ruler is read from the spacer the engine sized, not from the live window height,
+  // which changes every time a phone's toolbar collapses or returns.
+  var spacer = document.querySelector('[data-sc-spacer]'), ruler = innerHeight;
+  function measureRuler() { var h = spacer ? spacer.offsetHeight : 0; if (h > 0) ruler = h / (TOTAL + 1); }
+  measureRuler();
+  addEventListener('resize', measureRuler);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureRuler);
+  function trackPos() {                     // viewport-heights along the flight, same ruler as the engine
+    return Math.min(TOTAL, Math.max(0, (scrollY - root.offsetTop) / ruler));
+  }
+  /* One smooth scroll for everything. The wheel moves a target; the page eases
+     toward it; the engine's copy, the map and the 3D scene all read the same
+     scroll position each frame, so nothing trails anything. Touch keeps native
+     momentum, and reduced motion keeps plain scrolling. */
+  var smooth = { target: scrollY, y: scrollY, set: -1 };
+  function smoothOn() { return fine.matches && !reduce.matches; }
+  function maxScroll() { return Math.max(0, document.documentElement.scrollHeight - innerHeight); }
+  addEventListener('wheel', function (e) {
+    if (!smoothOn() || e.ctrlKey || e.defaultPrevented) return;
+    e.preventDefault();
+    var d = e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1);
+    smooth.target = Math.max(0, Math.min(maxScroll(), smooth.target + d));
+  }, { passive: false });
+  addEventListener('scroll', function () {
+    // Keyboard, scrollbar, find-in-page: anything we did not cause becomes the new resting point.
+    if (Math.abs(scrollY - smooth.set) > 2) { smooth.target = smooth.y = scrollY; smooth.set = scrollY; }
+  }, { passive: true });
+  function smoothStep(dt) {
+    if (!smoothOn()) { smooth.target = smooth.y = scrollY; return; }
+    var gap = smooth.target - smooth.y;
+    if (gap === 0) return;
+    if (Math.abs(gap) < 0.25) smooth.y = smooth.target;                 // arrive exactly, then rest
+    else smooth.y += gap * (1 - Math.pow(1 - 0.09, dt * 60));
+    smooth.set = Math.round(smooth.y);
+    scrollTo(0, smooth.y);
+  }
+  function stopY(k) {
+    if (k === 0) return 0;
+    var y = root.offsetTop + (c0[k] + legs[k] * (k === legs.length - 1 ? 1 : 0.62)) * ruler;
+    return Math.min(y, maxScroll());
+  }
+  function land(y) {                                   // move instantly, and tell the smooth scroll where it now rests
+    smooth.target = smooth.y = y; smooth.set = Math.round(y);
+    scrollTo(0, y);
+  }
+  function currentLeg() { var pos = trackPos(), k = 0; for (var j = 0; j < legs.length; j++) if (pos >= c0[j]) k = j; return k; }
+  // The next or previous stop glides there, because that is one short leg.
+  // Anything further lands directly behind a quick cover instead of flying through every stop between.
+  var curtain = $('[data-curtain]'), jumping = false;
+  function jump(k) {
+    var y = stopY(k), here = currentLeg();
+    if (reduce.matches) { land(y); return; }
+    if (Math.abs(k - here) <= 1 && smoothOn()) { smooth.target = y; return; }
+    if (jumping) return;
+    jumping = true;
+    curtain.classList.add('on');
+    setTimeout(function () {
+      land(y);
+      requestAnimationFrame(function () { requestAnimationFrame(function () { curtain.classList.remove('on'); jumping = false; }); });
+    }, 180);
+  }
+  $$('[data-jump]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      jump(+a.getAttribute('data-jump'));
+      if (a.classList.contains('map__stop')) closeStops();
+    });
+  });
+
+  // Keyboard: arrows move between stops, Home and End go to the first and last.
+  var stopEls = $$('[data-map] .map__stop');
+  $('[data-map]').addEventListener('keydown', function (e) {
+    var i = stopEls.indexOf(document.activeElement); if (i < 0) return;
+    var to = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? i - 1
+           : e.key === 'Home' ? 0 : e.key === 'End' ? stopEls.length - 1 : null;
+    if (to === null) return;
+    e.preventDefault();
+    stopEls[Math.max(0, Math.min(stopEls.length - 1, to))].focus();
+  });
+
+  // Phones: the bar opens the full list of stops.
+  var mapNav = $('[data-mapnav]'), toggle = $('[data-toggle]');
+  function closeStops() { if (!mapNav.classList.contains('open')) return; mapNav.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); }
+  toggle.addEventListener('click', function () {
+    var open = !mapNav.classList.contains('open');
+    mapNav.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open));
+    if (open) { var here = stopEls[currentLeg()]; if (here) here.focus({ preventScroll: true }); }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && mapNav.classList.contains('open')) { closeStops(); toggle.focus(); } });
+  document.addEventListener('pointerdown', function (e) { if (!mapNav.contains(e.target)) closeStops(); });
+
+  /* ------------------------------------------- open or closed, India time */
+  (function status() {
+    var parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+    var get = function (t) { return (parts.find(function (p) { return p.type === t; }) || {}).value; };
+    var d = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday'));
+    var now = (parseInt(get('hour'), 10) % 24) + parseInt(get('minute'), 10) / 60;
+    var open = function (x) { return x === 0 ? 9 : 7; }, shut = function (x) { return x === 0 ? 17 : 18; };
+    var pad = function (h) { return String(h).padStart(2, '0') + ':00'; }, txt;
+    if (now >= open(d) && now < shut(d)) txt = 'Open now, till ' + pad(shut(d));
+    else if (now < open(d)) txt = 'Closed. Opens ' + pad(open(d));
+    else { var n = (d + 1) % 7; txt = 'Closed. Opens ' + pad(open(n)) + (n === 0 ? ' Sunday' : ' tomorrow'); }
+    document.querySelectorAll('[data-status]').forEach(function (el) { el.textContent = txt; });
+    var row = $('[data-hours] tr[data-day="' + d + '"]'); if (row) row.classList.add('today');
+    var short = $('.hours--short tr[data-days="' + (d === 0 ? '0' : '1-6') + '"]'); if (short) short.classList.add('today');
+    setTimeout(status, 60000);
+  })();
+
+  /* ------------------------------------------------ the stops follow */
+  // Past stops are filled, the current one fills as you move through it, the rest wait.
+  var nowEl = $('[data-now]'), ticks = stopEls.map(function (b) { return b.querySelector('.map__tick i'); });
+  var LABELS = stopEls.map(function (b) { return b.querySelector('.map__label').textContent; });
+  var lastLeg = -1, fills = [], lastRoute = '';
+  function updateMap(k, pos) {
+    if (k !== lastLeg) {
+      lastLeg = k;
+      stopEls.forEach(function (b, i) {
+        if (i === k) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+        b.classList.toggle('is-past', i < k);
+      });
+      nowEl.innerHTML = '<b>' + String(k).padStart(2, '0') + '</b> ' + LABELS[k];
+    }
+    var local = Math.min(1, Math.max(0, (pos - c0[k]) / legs[k]));
+    for (var i = 0; i < ticks.length; i++) {
+      var f = (i < k ? 1 : i === k ? local : 0).toFixed(2);
+      if (f !== fills[i]) { fills[i] = f; ticks[i].style.setProperty('--fill', f); }
+    }
+    var route = (pos / TOTAL).toFixed(3);
+    if (route !== lastRoute) { lastRoute = route; toggle.style.setProperty('--route', route); }
+  }
+
+  // Copy blocks that are not showing must not take keyboard focus either.
+  var copies = $$('[data-sc-copy]');
+  function inertCopies() {
+    copies.forEach(function (el) {
+      var off = (parseFloat(el.style.opacity || '0') < 0.1);
+      if (off !== el.inert) el.inert = off;
+    });
+  }
+
+  /* ------------------------------------------------------------ WebGL */
+  var cv = $('[data-gl]');
+  var gl = cv.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' });
+  if (!gl) { runChromeOnly(); return; }
+  document.documentElement.classList.add('has-gl');
+
+  var N = small.matches ? 8000 : 16000;
+  var R = (function (seed) { var s = seed >>> 0; return function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; })(20241127);
+
+  var BG = [0x12 / 255, 0x1C / 255, 0x1C / 255];
+  var RED = [0.851, 0.090, 0.204], BONE = [1.0, 0.965, 0.957], TEAL = [0.576, 0.659, 0.643];
+  var RAW = [0.80, 0.86, 0.84];                        // pale teal-bone: the raw bean
+  var LIGHT = norm([-0.4, 0.6, 0.7]);
+  function norm(v) { var l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; }
+  function mul(c, k) { return [Math.min(1, c[0] * k), Math.min(1, c[1] * k), Math.min(1, c[2] * k)]; }
+  function mix(a, b, t) { return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]; }
+  function lit(n) { return Math.max(0, n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]); }
+
+  /* ------------------------------------------ building arrangements */
+  function State() { this.p = new Float32Array(N * 4); this.c = new Float32Array(N * 3); this.i = 0; this.groups = []; }
+  State.prototype.put = function (x, y, z, w, col) {
+    if (this.i >= N) return;
+    var i = this.i++;
+    this.p[i * 4] = x; this.p[i * 4 + 1] = y; this.p[i * 4 + 2] = z; this.p[i * 4 + 3] = w;
+    this.c[i * 3] = col[0]; this.c[i * 3 + 1] = col[1]; this.c[i * 3 + 2] = col[2];
+  };
+  // Fill `share` of N with fn(); the last call of a state fills whatever remains.
+  State.prototype.group = function (share, fn, sort) {
+    var start = this.i, want = share >= 1 ? N - this.i : Math.min(N - this.i, Math.round(N * share));
+    while (this.i < start + want) fn(this);
+    if (sort !== false) this.sortRange(start, this.i);
+    return this;
+  };
+  // Neighbours map to neighbours: sort each group by angle in the view plane, so a morph sweeps instead of scrambling.
+  State.prototype.sortRange = function (a, b) {
+    var idx = [], p = this.p, c = this.c, i;
+    for (i = a; i < b; i++) idx.push(i);
+    var key = function (j) { return Math.atan2(p[j * 4 + 1], p[j * 4]) * 10 + Math.hypot(p[j * 4], p[j * 4 + 1]); };
+    idx.sort(function (m, n) { return key(m) - key(n); });
+    var np = new Float32Array((b - a) * 4), nc = new Float32Array((b - a) * 3);
+    idx.forEach(function (j, k) { np.set(p.subarray(j * 4, j * 4 + 4), k * 4); nc.set(c.subarray(j * 3, j * 3 + 3), k * 3); });
+    p.set(np, a * 4); c.set(nc, a * 3);
+  };
+
+  function gauss() { var u = 1 - R(), v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function onSphere() { var v = [gauss(), gauss(), gauss()]; return norm(v); }
+
+  // Rasterise a 2D shape and return a sampler of points inside it (1000x1000 design space).
+  function raster(draw) {
+    var cv2 = document.createElement('canvas'); cv2.width = cv2.height = 500;
+    var g = cv2.getContext('2d', { willReadFrequently: true });
+    g.setTransform(0.5, 0, 0, 0.5, 0, 0); g.fillStyle = '#000';
+    draw(g);
+    var d = g.getImageData(0, 0, 500, 500).data, pool = [];
+    for (var y = 0; y < 500; y++) for (var x = 0; x < 500; x++) if (d[(y * 500 + x) * 4 + 3] > 128) pool.push(x, y);
+    return function () { var k = Math.floor(R() * pool.length / 2); return [(pool[k * 2] + R()) * 2, (pool[k * 2 + 1] + R()) * 2]; };
+  }
+  var LOGO = 'M20 50H70V70H90V100H70V110H90V140H60V126Q60 120 54 120H36Q30 120 30 126V140H0V110H20V100H0V70H20ZM35.5 80H54.5A5.5 5.5 0 0 1 54.5 91H35.5A5.5 5.5 0 0 1 35.5 80ZM160 90H110V70H90V40H110V30H90V0H120V14Q120 20 126 20H144Q150 20 150 14V0H180V30H160V40H180V70H160ZM144.5 60H125.5A5.5 5.5 0 0 1 125.5 49H144.5A5.5 5.5 0 0 1 144.5 60Z';
+  var logoPt = raster(function (g) { g.translate(140, 251); g.scale(4, 4); g.fill(new Path2D(LOGO), 'evenodd'); });
+
+  function logo3d(S) {
+    var q = logoPt(), x = (q[0] - 500) / 300, y = -(q[1] - 500) / 300;
+    var face = R() < 0.72, z = face ? (R() < 0.5 ? 0.11 : -0.11) : (R() - 0.5) * 0.22;
+    S.put(x, y, z, 0, mul(RED, (face && z > 0 ? 1.08 : 0.8) * (0.92 + R() * 0.16)));
+  }
+
+  // A coffee bean: a flattened ellipsoid with the crease cut into its flat face.
+  function beanPoint(scale) {
+    var n = onSphere(), s = 0.96 + R() * 0.04;
+    var x = n[0] * 0.64 * s, y = n[1] * 0.98 * s, z = n[2] * 0.52 * s;
+    if (z > 0) z *= 0.52;
+    var groove = x - 0.11 * Math.sin(y * 2.7);
+    var shade = lit(norm([n[0] / 0.64, n[1] / 0.98, n[2] / 0.52]));
+    if (n[2] > 0 && Math.abs(groove) < 0.075) { z -= 0.16 * Math.pow(1 - Math.abs(groove) / 0.075, 1.4); shade *= 0.45; }
+    var a = -0.42, ca = Math.cos(a), sa = Math.sin(a);
+    return { x: (x * ca - y * sa) * scale, y: (x * sa + y * ca) * scale, z: z * scale, shade: shade };
+  }
+  function bean(roasted) {
+    return function (S) {
+      var b = beanPoint(roasted ? 1.08 : 1);
+      var k = 0.42 + 0.72 * b.shade;
+      var col = roasted ? (R() < 0.05 ? mul(BONE, 0.8) : mul(RED, 0.5 + 0.62 * b.shade)) : mul(RAW, k);
+      S.put(b.x, b.y, b.z, 0, col);
+    };
+  }
+
+  // The grind: a tall vortex of grains around the camera's path. Role 2 spins in the shader.
+  // A funnel: wide at the top, tight at the bottom, wound into five spiral arms.
+  function vortex(S) {
+    var y = (R() - 0.5) * 3.4, h = (y + 1.7) / 3.4;                 // 0 at the bottom, 1 at the top
+    var arm = Math.floor(R() * 5), spread = gauss() * 0.16;
+    var th = arm / 5 * Math.PI * 2 + y * 2.1 + spread;
+    var r = (0.18 + h * h * 1.15) * (0.9 + R() * 0.2);
+    var col = R() < 0.14 ? mul(BONE, 0.9) : mul(RED, 0.6 + 0.45 * (1 - Math.abs(spread) * 3));
+    S.put(r * Math.cos(th), y, r * Math.sin(th), 2, col);
+  }
+
+  // Vessels are bone. Points on surfaces read as fine line-work.
+  function cupSurface(S, ox, oy, sc) {
+    var t = R(), x, y, z;
+    if (t < 0.7) {                                                   // wall
+      y = -1.05 + R() * 0.85; var r = 0.4 + (y + 1.05) / 0.85 * 0.2, th = R() * Math.PI * 2;
+      x = r * Math.cos(th); z = r * Math.sin(th);
+    } else if (t < 0.84) {                                           // rim
+      var th2 = R() * Math.PI * 2; x = 0.6 * Math.cos(th2); z = 0.6 * Math.sin(th2); y = -0.2;
+    } else {                                                         // handle
+      var a = -1.45 + R() * 2.9; x = 0.64 + 0.2 * Math.cos(a); y = -0.6 + 0.24 * Math.sin(a); z = (R() - 0.5) * 0.05;
+    }
+    var sh = 0.55 + 0.45 * lit(norm([x, 0.2, z]));
+    S.put(ox + x * sc, oy + y * sc, z * sc, 0, mul(BONE, sh));
+  }
+  function liquid(S, ox, oy, sc, top) {                              // red coffee filling the cup
+    var y = -0.98 + R() * (top + 0.98), r = (0.36 + (y + 1.05) / 0.85 * 0.2) * Math.sqrt(R()), th = R() * Math.PI * 2;
+    var surf = y > top - 0.05;
+    S.put(ox + r * Math.cos(th) * sc, oy + y * sc, r * Math.sin(th) * sc, 0, surf ? mix(RED, BONE, 0.18) : mul(RED, 0.62 + R() * 0.35));
+  }
+  var CUP = null;                                                    // the same cup grains in Extract and Cup
+  function makeCup() {
+    var tmp = new State(); tmp.i = 0;
+    var n = Math.round(N * 0.3);
+    while (tmp.i < n) cupSurface(tmp, 0, 0, 1);
+    tmp.sortRange(0, n);
+    CUP = { p: tmp.p.slice(0, n * 4), c: tmp.c.slice(0, n * 3), n: n };
+  }
+  function addCup(S) { S.p.set(CUP.p, S.i * 4); S.c.set(CUP.c, S.i * 3); S.i += CUP.n; }
+
+  function extractState() {
+    var S = new State();
+    addCup(S);
+    S.group(0.3, function (S) {                                      // the packed puck in its basket
+      var r = 0.5 * Math.sqrt(R()), th = R() * Math.PI * 2;
+      S.put(r * Math.cos(th), 0.92 + R() * 0.14, r * Math.sin(th), 0, mul(RED, 0.5 + R() * 0.3));
+    });
+    S.group(0.04, function (S) { var th = R() * Math.PI * 2; S.put(0.56 * Math.cos(th), 0.9 + R() * 0.2, 0.56 * Math.sin(th), 0, mul(BONE, 0.7)); });
+    S.group(0.16, function (S) {                                     // the stream: role 1 + length/10
+      S.put((R() - 0.5) * 0.04, 0.86, (R() - 0.5) * 0.04, 1 + 1.7 / 10, mul(RED, 0.85 + R() * 0.2));
+    }, false);
+    S.group(1, function (S) { liquid(S, 0, 0, 1, -0.86); });
+    return S;
+  }
+  function cupState() {
+    var S = new State();
+    addCup(S);
+    S.group(0.44, function (S) { liquid(S, 0, 0, 1, -0.3); });
+    S.group(0.12, function (S) {                                     // saucer
+      var r = 0.62 + R() * 0.4, th = R() * Math.PI * 2; S.put(r * Math.cos(th), -1.1, r * Math.sin(th) * 0.9, 0, mul(BONE, 0.45 + R() * 0.3));
+    });
+    S.group(1, function (S) {                                        // steam: role 3 rises in the shader
+      var r = 0.22 * Math.sqrt(R()), th = R() * Math.PI * 2; S.put(r * Math.cos(th), -0.25, r * Math.sin(th), 3, mul(BONE, 0.55 + R() * 0.3));
+    }, false);
+    return S;
+  }
+
+  // The menu: an espresso cup, a pour-over cone over its carafe, a cold glass with ice.
+  function menuState() {
+    var S = new State(), X = [-1.9, 0, 1.9];
+    S.group(0.12, function (S) { cupSurface(S, X[0], -0.35, 0.72); });
+    S.group(0.1, function (S) { liquid(S, X[0], -0.35, 0.72, -0.35); });
+    S.group(0.05, function (S) { var r = 0.45 + R() * 0.3, th = R() * Math.PI * 2; S.put(X[0] + r * Math.cos(th), -1.15, r * Math.sin(th) * 0.9, 0, mul(BONE, 0.5)); });
+    S.group(0.13, function (S) {                                     // V60 cone with its ribs
+      var y = 0.12 + R() * 0.9, r = 0.08 + (y - 0.12) * 0.72, th = R() < 0.35 ? (Math.floor(R() * 14) / 14 * Math.PI * 2 + (y - 0.12) * 1.4) : R() * Math.PI * 2;
+      S.put(X[1] + r * Math.cos(th), y, r * Math.sin(th), 0, mul(BONE, 0.55 + 0.45 * lit(norm([Math.cos(th), 0.3, Math.sin(th)]))));
+    });
+    S.group(0.06, function (S) { var y = 0.18 + R() * 0.3, r = (0.1 + (y - 0.12) * 0.72) * Math.sqrt(R()) * 0.9, th = R() * Math.PI * 2; S.put(X[1] + r * Math.cos(th), y, r * Math.sin(th), 0, mul(RED, 0.55 + R() * 0.3)); });
+    S.group(0.1, function (S) {                                      // carafe
+      var n = onSphere(); if (n[1] > 0.55) n[1] = 0.55;
+      S.put(X[1] + n[0] * 0.52, -0.62 + n[1] * 0.46, n[2] * 0.52, 0, mul(BONE, 0.5 + 0.4 * lit(n)));
+    });
+    S.group(0.06, function (S) { var n = onSphere(); var y = -0.62 + n[1] * 0.44; if (y > -0.7) y = -0.7 - R() * 0.2; var r = Math.sqrt(Math.max(0, 0.2 - (y + 0.62) * (y + 0.62))) * Math.sqrt(R()); var th = R() * Math.PI * 2; S.put(X[1] + r * Math.cos(th), y, r * Math.sin(th), 0, mul(RED, 0.6 + R() * 0.3)); });
+    S.group(0.03, function (S) { S.put(X[1] + (R() - 0.5) * 0.02, 0.1, (R() - 0.5) * 0.02, 1 + 0.55 / 10, RED); }, false);
+    S.group(0.14, function (S) {                                     // tall glass
+      var t = R(), y, th = R() * Math.PI * 2, r = 0.44;
+      if (t < 0.88) y = -1.0 + R() * 1.9; else { y = -1.0; r = 0.44 * Math.sqrt(R()); }
+      S.put(X[2] + r * Math.cos(th), y, r * Math.sin(th), 0, mul(BONE, 0.45 + 0.5 * lit(norm([Math.cos(th), 0.1, Math.sin(th)]))));
+    });
+    S.group(0.11, function (S) { var y = -0.96 + R() * 1.34, r = 0.4 * Math.sqrt(R()), th = R() * Math.PI * 2; S.put(X[2] + r * Math.cos(th), y, r * Math.sin(th), 0, mul(RED, 0.55 + R() * 0.4)); });
+    S.group(1, function (S) {                                        // ice
+      var cubes = [[-0.1, 0.25, 0.05, 0.5], [0.13, 0.05, -0.08, 1.1], [-0.05, -0.2, 0.1, 2.0]], k = cubes[Math.floor(R() * 3)];
+      var f = Math.floor(R() * 6), u = R() - 0.5, v = R() - 0.5, p = [0, 0, 0];
+      var ax = f >> 1, sg = f & 1 ? 0.5 : -0.5; p[ax] = sg; p[(ax + 1) % 3] = u; p[(ax + 2) % 3] = v;
+      var a = k[3], ca = Math.cos(a), sa = Math.sin(a), s = 0.24;
+      var x = (p[0] * ca - p[2] * sa) * s, z = (p[0] * sa + p[2] * ca) * s, y = (p[1] * ca - p[0] * sa * 0.3) * s;
+      S.put(X[2] + k[0] + x, k[1] + y, k[2] + z, 0, mul(BONE, 0.75 + R() * 0.25));
+    });
+    return S;
+  }
+
+  function textState(text) {
+    var pt = raster(function (g) {
+      g.font = '700 190px "Neue Montreal", "Helvetica Neue", Arial, sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      try { g.letterSpacing = '-8px'; } catch (e) {}
+      g.fillText(text, 500, 500);
+    });
+    var S = new State();
+    S.group(0.86, function (S) { var q = pt(); S.put((q[0] - 500) / 330, -(q[1] - 500) / 330, (R() - 0.5) * 0.08, 0, mul(BONE, 0.82 + R() * 0.18)); });
+    S.group(1, function (S) { var q = pt(); S.put((q[0] - 500) / 330, -(q[1] - 500) / 330, -0.1 - R() * 0.1, 0, mul(RED, 0.8)); });
+    return S;
+  }
+
+  function dustState() {
+    var S = new State();
+    S.group(1, function (S) {
+      var n = onSphere(), r = 1.6 + Math.pow(R(), 0.6) * 3.2;
+      S.put(n[0] * r, n[1] * r * 0.7, n[2] * r, 2, R() < 0.08 ? mul(RED, 0.9) : mul(TEAL, 0.45 + R() * 0.5));
+    }, false);
+    return S;
+  }
+
+  function simple(fn) { var S = new State(); S.group(1, fn); return S; }
+
+  /* ------------------------------------------------------------ GL */
+  var VS = [
+    'attribute vec4 aA; attribute vec4 aB; attribute vec3 cA; attribute vec3 cB; attribute vec4 aR;',
+    'uniform mat4 uProj, uView; uniform float uT, uTime, uSpinA, uSpinB, uFlow, uScatter, uSize, uDpr, uRepel, uAspect, uFog0;',
+    'uniform vec2 uPtr; varying vec3 vCol; varying float vFog;',
+    'vec3 role(vec4 p, float spin) {',
+    '  vec3 q = p.xyz;',
+    '  if (p.w > 1.5 && p.w < 2.5) { float a = spin * (1.5 - length(q.xz) * 0.35); float c = cos(a), s = sin(a); q.xz = vec2(c * q.x - s * q.z, s * q.x + c * q.z); }',
+    '  else if (p.w > 0.5 && p.w < 1.5) { float len = (p.w - 1.0) * 10.0; q.y -= fract(aR.z + uFlow) * len; }',
+    '  else if (p.w > 2.5) { float ph = fract(aR.z + uTime * 0.11); q.y += ph * 1.1; q.x += sin(ph * 7.0 + aR.z * 40.0) * 0.08 * ph; }',
+    '  return q;',
+    '}',
+    'void main() {',
+    '  vec3 A = role(aA, uSpinA), B = role(aB, uSpinB);',
+    '  float t = clamp((uT - aR.x * 0.4) / 0.6, 0.0, 1.0); t = t * t * (3.0 - 2.0 * t);',
+    '  vec3 p = mix(A, B, t);',
+    '  float arc = sin(t * 3.14159);',
+    '  p += arc * vec3(aR.y * 0.55, (aR.w - 0.5) * 0.45, (aR.z - 0.5) * 0.7);',
+    '  p += uScatter * (vec3(fract(aR.z * 13.1), fract(aR.x * 7.3), fract(aR.y * 5.9 + 0.5)) - 0.5);',
+    '  vec4 v = uView * vec4(p, 1.0);',
+    '  vec4 clip = uProj * v;',
+    '  vec2 ndc = clip.xy / clip.w; vec2 d = ndc - uPtr; d.x *= uAspect; float dist = length(d);',
+    '  ndc += (d / max(dist, 0.0001)) * vec2(1.0 / uAspect, 1.0) * uRepel * 0.1 * smoothstep(0.26, 0.0, dist);',
+    '  clip.xy = ndc * clip.w;',
+    '  gl_Position = clip;',
+    '  float depth = max(-v.z, 0.05);',
+    '  gl_PointSize = clamp(uSize * uDpr * (0.65 + aR.w * 0.7) / depth, 1.0, 11.0 * uDpr);',
+    '  vCol = mix(cA, cB, t);',
+    '  vFog = clamp((depth - uFog0) / 6.0, 0.0, 0.45);',
+    '}'
+  ].join('\n');
+  var FS = [
+    'precision mediump float; uniform vec3 uBg; varying vec3 vCol; varying float vFog;',
+    'void main() { vec2 c = gl_PointCoord - 0.5; if (dot(c, c) > 0.25) discard; gl_FragColor = vec4(mix(vCol, uBg, vFog), 1.0); }'
+  ].join('\n');
+  function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+  var prog = gl.createProgram();
+  try {
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  } catch (e) { document.documentElement.classList.remove('has-gl'); runChromeOnly(); return; }
+  gl.useProgram(prog);
+  var A = {}, U = {};
+  ['aA', 'aB', 'cA', 'cB', 'aR'].forEach(function (n) { A[n] = gl.getAttribLocation(prog, n); gl.enableVertexAttribArray(A[n]); });
+  ['uProj', 'uView', 'uT', 'uTime', 'uSpinA', 'uSpinB', 'uFlow', 'uScatter', 'uSize', 'uDpr', 'uRepel', 'uAspect', 'uPtr', 'uBg', 'uFog0'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(BG[0], BG[1], BG[2], 1);
+  gl.uniform3f(U.uBg, BG[0], BG[1], BG[2]);
+
+  function buffer(arr) { var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, arr, gl.STATIC_DRAW); return b; }
+  var rnd = new Float32Array(N * 4);
+  for (var i = 0; i < N; i++) { rnd[i * 4] = R(); rnd[i * 4 + 1] = R() * 2 - 1; rnd[i * 4 + 2] = R(); rnd[i * 4 + 3] = R(); }
+  var rBuf = buffer(rnd);
+  gl.bindBuffer(gl.ARRAY_BUFFER, rBuf); gl.vertexAttribPointer(A.aR, 4, gl.FLOAT, false, 0, 0);
+
+  /* -------------------------------------------- the ten arrangements */
+  var STATES = null, BUF = null;
+  // Per waypoint: the arrangement, and how its spin runs with the leg's own progress.
+  var SPIN = [0, 0, 0, 7.0, 0, 0, 0, 0, 1.4, 0];
+  // The opening logo is built first so the scene can appear straight away; every other
+  // arrangement follows one per task, so the page never blocks while they are made.
+  function upload(i, S) { BUF[i] = { p: buffer(S.p), c: buffer(S.c) }; }
+  function build(fontsReady) {
+    STATES = new Array(10); BUF = new Array(10);
+    var logo = simple(logo3d);
+    STATES[0] = STATES[9] = logo; upload(0, logo); BUF[9] = BUF[0];
+    var jobs = [
+      function () { STATES[1] = simple(bean(false)); upload(1, STATES[1]); },
+      function () { STATES[2] = simple(bean(true)); upload(2, STATES[2]); },
+      function () { STATES[3] = simple(vortex); upload(3, STATES[3]); },
+      function () { makeCup(); STATES[4] = extractState(); upload(4, STATES[4]); },
+      function () { STATES[5] = cupState(); upload(5, STATES[5]); },
+      function () { STATES[6] = menuState(); upload(6, STATES[6]); },
+      function () { STATES[8] = dustState(); upload(8, STATES[8]); },
+      function () { fontsReady.then(function () { STATES[7] = textState('92–96 °C'); upload(7, STATES[7]); }); }
+    ];
+    (function next() { var job = jobs.shift(); if (!job) return; job(); setTimeout(next, 0); })();
+  }
+
+  /* ---------------------------------------------------------- camera */
+  // Per waypoint: where the camera starts its hold and where it ends it.
+  // [radius, azimuth, elevation, target x, target y]
+  var CAM = [
+    [[4.4, 0.0, 0.02, 0, 0], [4.1, 0.28, 0.06, 0, 0]],
+    [[3.7, 0.45, 0.14, 0, 0], [3.4, -0.35, 0.08, 0, 0]],
+    [[3.3, -0.6, -0.08, 0, 0], [3.0, -1.2, 0.04, 0, 0]],
+    [[3.6, -1.4, 0.22, 0, 0.1], [0.55, -3.4, 1.18, 0, 0.6]],
+    [[4.4, 0.35, 0.14, 0, -0.05], [4.0, 0.08, 0.1, 0, -0.05]],
+    [[3.2, -0.25, 0.36, 0, -0.55], [2.8, 1.5, 0.46, 0, -0.55]],
+    [[5.6, 0.3, 0.16, 0.1, -0.2], [5.1, -0.3, 0.16, 0.7, -0.2]],
+    [[4.2, 0.0, 0.0, 0, 0], [3.9, -0.18, 0.04, 0, 0]],
+    [[0.9, 0.0, 0.1, 0, 0], [0.7, 0.9, -0.1, 0, 0]],
+    [[5.0, -0.5, 0.12, 0, 0], [4.3, 0.0, 0.0, 0, 0]]
+  ];
+  // Phones are narrow: step the camera back on the wide shapes (the logo and the numbers) so they fit.
+  var CAM_BASE = CAM.map(function (pair) { return pair.map(function (key) { return key.slice(); }); });
+  var PHONE_R = [1.45, 1, 1, 1, 1.05, 1, 1, 1.45, 1, 1.45];
+  function fitCam() {
+    CAM = CAM_BASE.map(function (pair, k) {
+      return pair.map(function (key) { var c = key.slice(); if (small.matches) c[0] *= PHONE_R[k]; return c; });
+    });
+    // Short phone screens: the last stop carries the address and hours, so the closing logo
+    // steps back and stays above them. Measured on the fixed ruler, never the live height,
+    // so Safari's toolbar can't change it mid-scroll.
+    if (small.matches && ruler < 720) {
+      var back = ruler < 600 ? 2.7 : 1.45, lift = ruler < 600 ? -1.35 : -0.35;
+      CAM[9] = CAM[9].map(function (key) { var c = key.slice(); c[0] *= back; c[4] = lift; return c; });
+    }
+  }
+  fitCam();
+  small.addEventListener('change', fitCam);
+  addEventListener('resize', function () { measureRuler(); fitCam(); });
+  function lerpv(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
+  var ease = function (t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
+  var MORPH = 0.45;                                   // share of each leg spent arriving
+  function camAt(k, local) {
+    if (k === 0) return lerpv(CAM[0][0], CAM[0][1], ease(local));
+    if (local < MORPH) return lerpv(CAM[k - 1][1], CAM[k][0], ease(local / MORPH));
+    return lerpv(CAM[k][0], CAM[k][1], ease((local - MORPH) / (1 - MORPH)));
+  }
+  function perspective(fovy, aspect, near, far, sx, sy) {
+    var f = 1 / Math.tan(fovy / 2), nf = 1 / (near - far);
+    return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, -sx, -sy, (far + near) * nf, -1, 0, 0, 2 * far * near * nf, 0]);
+  }
+  function lookAt(e, t) {
+    var z = norm([e[0] - t[0], e[1] - t[1], e[2] - t[2]]);
+    var x = norm([z[2], 0, -z[0]]);                    // cross([0,1,0], z)
+    var y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+    return new Float32Array([x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0,
+      -(x[0] * e[0] + x[1] * e[1] + x[2] * e[2]), -(y[0] * e[0] + y[1] * e[1] + y[2] * e[2]), -(z[0] * e[0] + z[1] * e[1] + z[2] * e[2]), 1]);
+  }
+
+  /* ----------------------------------------------------------- input */
+  var ptr = [9, 9], ptrT = [9, 9], repel = 0, repelT = 0, vel = 0;
+  addEventListener('pointermove', function (e) {
+    if (e.pointerType !== 'mouse' || !fine.matches || reduce.matches) return;
+    ptrT = [e.clientX / innerWidth * 2 - 1, 1 - e.clientY / innerHeight * 2]; repelT = 1;
+  }, { passive: true });
+  document.addEventListener('pointerleave', function () { repelT = 0; });
+
+  /* ------------------------------------------------------------ frame */
+  var shownOnce = false, scatter = 0, dpr = 1, W = 0, H = 0, cur = trackPos(), prevPos = cur, lastT = performance.now(), boundPair = '', lastSig = '', visible = true;
+  function resize() {
+    var d = Math.min(1.75, devicePixelRatio || 1);
+    if (cv.clientWidth === W && cv.clientHeight === H && d === dpr) return;   // nothing changed: keep the buffer
+    dpr = d;
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    gl.viewport(0, 0, cv.width, cv.height);
+  }
+  function bindPair(a, b) {
+    var key = a + '>' + b; if (key === boundPair) return; boundPair = key;
+    gl.bindBuffer(gl.ARRAY_BUFFER, BUF[a].p); gl.vertexAttribPointer(A.aA, 4, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, BUF[b].p); gl.vertexAttribPointer(A.aB, 4, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, BUF[a].c); gl.vertexAttribPointer(A.cA, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, BUF[b].c); gl.vertexAttribPointer(A.cB, 3, gl.FLOAT, false, 0, 0);
+  }
+  function frame(now) {
+    var dt = Math.min(0.1, (now - lastT) / 1000); lastT = now;
+    var rm = reduce.matches;
+    cur = trackPos();                                  // same position the copy and map use this frame
+    // Speed comes from the same per-frame position the scene draws, not from scroll events:
+    // phones deliver those in uneven bursts, which made the grains pulse. A jump is not speed.
+    var step = Math.abs(cur - prevPos); prevPos = cur;
+    vel *= Math.pow(0.02, dt);
+    if (dt > 0 && step < 1.5) vel = Math.max(vel, step / dt);
+
+    var k = 0; for (var j = 0; j < legs.length; j++) if (cur >= c0[j]) k = j;
+    var local = Math.min(1, (cur - c0[k]) / legs[k]);
+    updateMap(k, cur);
+    inertCopies();
+
+    if (BUF && BUF[k] && visible) {
+      var a = Math.max(0, k - 1), b = k, t = k === 0 ? 1 : Math.min(1, local / MORPH);
+      if (!BUF[a]) { a = b; t = 1; }
+      if (rm) t = t < 0.5 ? 0 : 1;
+      bindPair(a, b);
+      var cam = rm ? CAM[k][t < 1 ? 0 : 0] : camAt(k, local);
+      if (rm && k > 0 && t < 1) cam = CAM[k - 1][1];
+      var r = cam[0], az = cam[1], el = cam[2], tg = [cam[3], cam[4], 0];
+      var eye = [tg[0] + r * Math.cos(el) * Math.sin(az), tg[1] + r * Math.sin(el), tg[2] + r * Math.cos(el) * Math.cos(az)];
+      var aspect = W / Math.max(1, H);
+      var sx = small.matches ? 0 : 0.24, sy = small.matches ? 0.26 : 0;
+      var fov = small.matches ? 0.95 : 0.72;
+
+      // Grains loosen with speed only where the page drives a smooth wheel scroll (laptops).
+      // On touch screens they hold their shape: native momentum plus loosening read as jerking.
+      var loosen = smoothOn() ? Math.min(0.22, vel * 0.05) : 0;
+      scatter += (loosen - scatter) * Math.min(1, dt * 5);
+      ptr[0] += (ptrT[0] - ptr[0]) * Math.min(1, dt * 10); ptr[1] += (ptrT[1] - ptr[1]) * Math.min(1, dt * 10);
+      repel += (repelT - repel) * Math.min(1, dt * 4);
+
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.uniformMatrix4fv(U.uProj, false, perspective(fov, aspect, 0.05, 60, sx, sy));
+      gl.uniformMatrix4fv(U.uView, false, lookAt(eye, tg));
+      gl.uniform1f(U.uT, t);
+      gl.uniform1f(U.uTime, rm ? 0 : now / 1000);
+      var spinPrev = SPIN[a] * (a === k ? local : 1), spinCur = SPIN[b] * local;
+      gl.uniform1f(U.uSpinA, rm ? 0 : spinPrev);
+      gl.uniform1f(U.uSpinB, rm ? 0 : spinCur);
+      gl.uniform1f(U.uFlow, rm ? 0 : now / 1000 * 0.75 + local * 2.0);
+      gl.uniform1f(U.uScatter, rm ? 0 : scatter);
+      gl.uniform1f(U.uSize, small.matches ? 12.0 : 11.0);         // phones sit further back, so grains draw a little larger
+      gl.uniform1f(U.uFog0, small.matches ? 6.6 : 4.3);           // and the fog starts later, so the red stays red
+      gl.uniform1f(U.uDpr, dpr);
+      gl.uniform1f(U.uRepel, rm ? 0 : repel);
+      gl.uniform1f(U.uAspect, aspect);
+      gl.uniform2f(U.uPtr, ptr[0], ptr[1]);
+      gl.drawArrays(gl.POINTS, 0, N);
+      if (!shownOnce) { shownOnce = true; cv.classList.add('on'); }
+
+      // Tell the verification harness what actually paints.
+      var sig = a + '>' + b + ':' + t.toFixed(2) + ':' + r.toFixed(2) + ',' + az.toFixed(2) + ',' + el.toFixed(2) + ':' + spinCur.toFixed(1);
+      if (sig !== lastSig) { lastSig = sig; cv.setAttribute('data-sc-verify-state', sig); }
+    }
+    smoothStep(dt);
+    requestAnimationFrame(frame);
+  }
+
+  addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function () { visible = !document.hidden; });
+  resize();
+  var ready = (document.fonts && document.fonts.load ? document.fonts.load('700 190px "Neue Montreal"') : Promise.resolve()).catch(function () {});
+  build(ready);
+  requestAnimationFrame(frame);
+
+  // Without WebGL the page still works: the mark stands in, and the map and copy run as normal.
+  function runChromeOnly() {
+    document.documentElement.classList.add('no-gl');
+    var last = performance.now();
+    (function tick(now) {
+      var dt = Math.min(0.1, ((now || last) - last) / 1000); last = now || last;
+      var pos = trackPos(), k = 0; for (var j = 0; j < legs.length; j++) if (pos >= c0[j]) k = j;
+      updateMap(k, pos); inertCopies(); smoothStep(dt);
+      requestAnimationFrame(tick);
+    })();
+  }
+})();
+</script>
+</body>
+</html>
